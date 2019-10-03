@@ -46,7 +46,7 @@ done
 ```
 
 This will creates: 
-* A file called "file_all_species_name.txt" where in each line are written the species names.
-* And each directory with the Genus_species name. 
+* A file called ```file_all_species_name.txt``` where in each line are written the species names.
+* And each directory with ```the Genus_species name```. 
 
 
