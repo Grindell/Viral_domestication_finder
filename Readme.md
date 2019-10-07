@@ -14,15 +14,15 @@ Le téléchargement impliquait le 07/10/19 1 471 031 séquences virales sous leu
 
 ###########Enlever les séquences RefSeq pouvant être des contaminantes#########
 
-# 1) Sélectionner dans NCBI - protein le mot clé ex: familles de phages, polydnavirus ...
-# 2) Télacharger la liste d'accession 
-# 3) Fusionner toutes les listes en une seule : 
+1) Sélectionner dans NCBI - protein le mot clé ex: familles de phages, polydnavirus ...
+2) Télacharger la liste d'accession 
+3) Fusionner toutes les listes en une seule : 
 
 ```cat liste1.txt liste2.txt liste3.txt > liste_complette_conta_access_number.txt```
 
-# 4) Eliminer les séquences Fasta ayant leur ID représenté dans la liste : "liste_complette_conta_access_number.txt :
+4) Eliminer les séquences Fasta ayant leur ID représenté dans la liste : "liste_complette_conta_access_number.txt :
 
-# Permet à partir d'un liste d'ID, de supprimer toutes les séquences d'un fichier fasta qui sont dans celle liste et d'ajouter les nouvelles séquences dans un nouveau fichier fasta
+Permet à partir d'un liste d'ID, de supprimer toutes les séquences d'un fichier fasta qui sont dans celle liste et d'ajouter les nouvelles séquences dans un nouveau fichier fasta
 
 ```awk 'BEGIN{while((getline<"conta_test.txt")>0)l[">"$1]=1}/^>/{f=!l[$1]}f' conta_del_test.faa > test.faa```
 
