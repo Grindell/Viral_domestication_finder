@@ -117,7 +117,7 @@ At the end of the process you should have the folowing message :
  ```cat /beegfs/data/bguinet/these/Species_genome_names.txt | while read line; do sed -i 's@:/beegfs/data/bguinet/these/Genomes/${line}/${line}.fa@@g' /beegfs/data/bguinet/these/Genomes/${line}/run_busco/run_BUSCO_v3/compiled_busco_aa ```
 
 # 5) Récupérer un summary de tous les busco générés 
- ```python3 /beegfs/home/bguinet/M2_script/Busco_summary.py /beegfs/home/bguinet/M2_script/file_all_species_name_and_outgroup.txt ```
+ ```python3 /beegfs/home/bguinet/M2_script/Busco_summary.py /beegfs/data/bguinet/these/Species_genome_names.txt ```
 
 
 
@@ -132,14 +132,14 @@ At the end of the process you should have the folowing message :
 #make an index 
 /beegfs/data/bguinet/TOOLS/mmseqs2/bin/mmseqs createindex /beegfs/data/bguinet/these/NCBI_protein_viruses/mmseqs2_viral_db /beegfs/data/bguinet/these/NCBI_protein_viruses/tmp
 
-# 1) # Créer dans chacun des directory d'espèce une fichier run_mmseqs2_V et Viral_mmseqs2_job.log
+#1) # Créer dans chacun des directory des Génomes d'espèces un fichier run_mmseqs2_V et Viral_mmseqs2_job.log
 for dir in */; do mkdir -p $dir/run_mmseqs2_V/Viral_mmseqs2_job.log/; done
 
-# 2) python make_busco_files.py short_file_species_name.txt 
+#2) python make_busco_files.py short_file_species_name.txt 
 python3 Make_job_mmseqs2.py -i /beegfs/home/bguinet/M2_script/file_all_species_name_and_outgroup.txt -t virus -db /beegfs/data/bguinet/M2/refseq/viral_queries_seq/mmseqs2_db -o ~/M2_script/mmseqs2_jobs
 
 
 
-# Génération d'un fichier Matches_i.m8
+#Génération d'un fichier Matches_i.m8
 
 #récupération du tableau tblastn généré par busco directemnt inclu dans le fichier R Overlapping.R
