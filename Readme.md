@@ -12,7 +12,7 @@ when executing scripts, then the results will be written at these paths.
 
 Le téléchargement impliquait le 07/10/19 1 471 031 séquences virales sous leurs formes protéiques. 
 
-###########Enlever les séquences RefSeq pouvant être des contaminantes#########
+###########Enlever les séquences protéiques pouvant être des contaminants#########
 
 1) Sélectionner dans NCBI - protein le mot clé ex: familles de phages, polydnavirus ...
 2) Télacharger la liste d'accession 
@@ -22,9 +22,11 @@ Le téléchargement impliquait le 07/10/19 1 471 031 séquences virales sous leu
 
 4) Eliminer les séquences Fasta ayant leur ID représenté dans la liste : "liste_complette_conta_access_number.txt :
 
-Permet à partir d'un liste d'ID, de supprimer toutes les séquences d'un fichier fasta qui sont dans celle liste et d'ajouter les nouvelles séquences dans un nouveau fichier fasta
+Permet à partir d'une liste d'ID, de supprimer toutes les séquences d'un fichier fasta qui sont dans celle liste et d'ajouter les nouvelles séquences dans un nouveau fichier fasta
 
 ```awk 'BEGIN{while((getline<"conta_test.txt")>0)l[">"$1]=1}/^>/{f=!l[$1]}f' conta_del_test.faa > test.faa```
+
+awk 'FNR==NR{a[$0];next} !($2 in a) && /^>/{flag=1} flag'  all_phages_and_polydnaviridae_families_conta.txt FS="[> ]"  sequences.fasta-2.txt > test2.faa
 
 
 #Bien débuter commence par bien organiser son espace de travail 
