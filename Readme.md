@@ -28,6 +28,13 @@ Permet à partir d'un liste d'ID, de supprimer toutes les séquences d'un fichie
 ```Purge_fasta_file.py -c /beegfs/data/bguinet/these/NCBI_protein_viruses/All_phages_and_polydnaviridae_families_conta.txt -f /beegfs/data/bguinet/these/NCBI_protein_viruses/All_viral_protein_sequences.fa -o /beegfs/data/bguinet/these/NCBI_protein_viruses/All_viral_protein_sequences_without_contamination.fa ```
 
 
+5) Nous allons ajouter maintenant les contrôles positifs, c'est à dire les séquences déjà connues pour avoir été dommestiquées par des génomes eucaryotes. 
+
+cat All_viral_protein_sequences_without_contamination.fa Positif_controls_viral_domestication.fa > All_viral_protein_sequences_without_contamination_controls.fa
+
+6) Vérifier qu'il n'y ait pas de séquences dupliquées : 
+
+
 
 #Bien débuter commence par bien organiser son espace de travail 
 First of all the user will have to make a file in which will be present all the genomes that he wants to study in format: Genus_species.fa
