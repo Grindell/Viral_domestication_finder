@@ -28,7 +28,10 @@ Permet à partir d'un liste d'ID, de supprimer toutes les séquences d'un fichie
 ```Purge_fasta_file.py -c /beegfs/data/bguinet/these/NCBI_protein_viruses/All_phages_and_polydnaviridae_families_conta.txt -f /beegfs/data/bguinet/these/NCBI_protein_viruses/All_viral_protein_sequences.fa -o /beegfs/data/bguinet/these/NCBI_protein_viruses/All_viral_protein_sequences_without_contamination.fa ```
 
 
-5) Nous allons ajouter maintenant les contrôles positifs, c'est à dire les séquences déjà connues pour avoir été dommestiquées par des génomes eucaryotes. 
+5) Nous allons ajouter maintenant les contrôles positifs, c'est à dire les séquences déjà connues pour avoir été dommestiquées par des génomes eucaryotes. Nous allons également les targeter. 
+
+Il faut déjà récupérer toutes ces séquences et les mettre dans un fichier fasta: Positif_controls_viral_domestication.fa
+Nous allons ensuite targeter ces séquences avec le dénomination_CT pour Crontrôle positif 
 
 cat All_viral_protein_sequences_without_contamination.fa Positif_controls_viral_domestication.fa > All_viral_protein_sequences_without_contamination_controls.fa
 
