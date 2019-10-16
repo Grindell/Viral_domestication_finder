@@ -33,7 +33,9 @@ Permet à partir d'un liste d'ID, de supprimer toutes les séquences d'un fichie
 Il faut déjà récupérer toutes ces séquences et les mettre dans un fichier fasta: Positif_controls_viral_domestication.fa
 Nous allons ensuite targeter ces séquences avec le dénomination_CT pour Crontrôle positif 
 
-cat All_viral_protein_sequences_without_contamination.fa Positif_controls_viral_domestication.fa > All_viral_protein_sequences_without_contamination_controls.fa
+> Positif_controls_viral_domestication_targeted.fa
+
+cat All_viral_protein_sequences_without_contamination.fa Positif_controls_viral_domestication_targeted.fa > All_viral_protein_sequences_without_contamination_controls.fa
 
 6) Vérifier qu'il n'y ait pas de séquences dupliquées : 
 
