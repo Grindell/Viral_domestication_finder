@@ -31,7 +31,9 @@ Permet à partir d'un liste d'ID, de supprimer toutes les séquences d'un fichie
 5) Nous allons ajouter maintenant les contrôles positifs, c'est à dire les séquences déjà connues pour avoir été dommestiquées par des génomes eucaryotes. Nous allons également les targeter. 
 
 Il faut déjà récupérer toutes ces séquences et les mettre dans un fichier fasta: Positif_controls_viral_domestication.fa
-Nous allons ensuite targeter ces séquences avec le dénomination_CT pour Crontrôle positif 
+Nous allons ensuite targeter ces séquences avec le dénomination_CT pour Crontrôle positif :
+
+```awk '/^>/{$1=$1"_CT"} 1' Positif_controls_viral_domestication.fa > Positif_controls_viral_domestication_targeted.fa```
 
 > Positif_controls_viral_domestication_targeted.fa
 
