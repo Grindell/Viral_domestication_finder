@@ -34,7 +34,14 @@ Il faut déjà récupérer toutes ces séquences et les mettre dans un fichier f
 Nous allons ensuite targeter ces séquences avec le dénomination_CP pour Crontrôle positif :
 
 ```awk '/^>/{$1=$1"_CP"} 1' Positif_controls_viral_domestication.fa > Positif_controls_viral_domestication_targeted.fa```
-
+```Explanation
+awk '            ##Starting awk program here.
+/^>/{            ##Checking condition if a line starts from > then do following.
+  $1=$1"_CT"     ##Setting value of $1 to $1 and concatenating _CT to it too.
+}                ##Closing BLOCK for this condition here.
+1                ##Mentioning 1 will print edited/non-edited line.
+' Input_file     ##Mentioning Input_file name here.
+```
 > Positif_controls_viral_domestication_targeted.fa
 
 cat All_viral_protein_sequences_without_contamination.fa Positif_controls_viral_domestication_targeted.fa > All_viral_protein_sequences_without_contamination_controls.fa
