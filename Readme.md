@@ -31,9 +31,9 @@ Permet à partir d'un liste d'ID, de supprimer toutes les séquences d'un fichie
 5) Nous allons ajouter maintenant les contrôles positifs, c'est à dire les séquences déjà connues pour avoir été dommestiquées par des génomes eucaryotes. Nous allons également les targeter. 
 
 Il faut déjà récupérer toutes ces séquences et les mettre dans un fichier fasta: Positif_controls_viral_domestication.fa
-Nous allons ensuite targeter ces séquences avec le dénomination_CT pour Crontrôle positif :
+Nous allons ensuite targeter ces séquences avec le dénomination_CP pour Crontrôle positif :
 
-```awk '/^>/{$1=$1"_CT"} 1' Positif_controls_viral_domestication.fa > Positif_controls_viral_domestication_targeted.fa```
+```awk '/^>/{$1=$1"_CP"} 1' Positif_controls_viral_domestication.fa > Positif_controls_viral_domestication_targeted.fa```
 
 > Positif_controls_viral_domestication_targeted.fa
 
@@ -143,10 +143,13 @@ At the end of the process you should have the folowing message :
 
 #Premier mmseqs2 query = genome ; db : virus protein sequences
 
+Créer une base de donnée virale MMseqs2 avec l'ensemble des séquences protéiques virales: 
 #make mmseqs2 db for all viral proteins
-/beegfs/data/bguinet/TOOLS/mmseqs2/bin/mmseqs createdb /beegfs/data/bguinet/these/NCBI_protein_viruses/viral_without_conta.protein.faa /beegfs/data/bguinet/these/NCBI_protein_viruses/mmseqs2_viral_db
+/beegfs/data/bguinet/TOOLS/MMseqs2/build/bin/mmseqs createdb /beegfs/data/bguinet/these/NCBI_protein_viruses/All_viral_protein_sequences_without_contamination_controls.fa /beegfs/data/bguinet/these/NCBI_protein_viruses/mmseqs2_viral_db
+
 #make an index 
-/beegfs/data/bguinet/TOOLS/mmseqs2/bin/mmseqs createindex /beegfs/data/bguinet/these/NCBI_protein_viruses/mmseqs2_viral_db /beegfs/data/bguinet/these/NCBI_protein_viruses/tmp
+/beegfs/data/bguinet/TOOLS/MMseqs2/build/bin/mmseqs createindex /beegfs/data/bguinet/these/NCBI_protein_viruses/mmseqs2_viral_db /beegfs/data/bguinet/these/NCBI_protein_viruses/tmp
+
 
 #1) # Créer dans chacun des directory des Génomes d'espèces un fichier run_mmseqs2_V et Viral_mmseqs2_job.log
 for dir in */; do mkdir -p $dir/run_mmseqs2_V/Viral_mmseqs2_job.log/; done
