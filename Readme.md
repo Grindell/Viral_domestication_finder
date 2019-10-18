@@ -1,13 +1,28 @@
+
+
+
 #Work in progress, all the code will be uploaded in few weeks with a tutorial.
 
 The developed pipeline involves the creation of certain files in well-established positions in the arborescence to ensure optimal fluidity
 when executing scripts, then the results will be written at these paths.
 
 
+##Telechargement des Génomes 
+1) Cette étape peut être effectuée en téléchargeant les génomes qui nous intéressent sur une platforme de partage de génomes assemblés comme NCBI. 
+
+2) Une fois que tous les génomes sont téléchargés, il convient d'évaluer la qualité de l'assemblage de ces génomes: 
+
+```python3 ~/these_scripts/Make_assembly_genome_stats_job.py -i /beegfs/data/bguinet/these/Species_genome_names.txt -p /beegfs/data/bguinet/these```
+
+Executer tous les jobs pour calculer les statistiques d'assemblage:
+```for file in Assembly_stat_job_*; do sbatch $file; done```
+
+
+Ainsi avec QUAST, un nouveau répértoire : Genome_assembly_statistics est crée pour chacun des génomes
 
 
 
-##Telechargement des bases de données necessaires :
+##Telechargement des bases de données nécessaires :
 #NCBI viruses proteins database : https://www.ncbi.nlm.nih.gov/labs/virus/vssi/#/virus?SeqType_s=Protein&VirusLineage_ss=Viruses,%20taxid:10239
 
 Le téléchargement impliquait le 07/10/19 1 471 031 séquences virales sous leurs formes protéiques. 
