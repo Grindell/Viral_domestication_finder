@@ -18,7 +18,7 @@ parser.add_argument("-p", "--path",help="The path where to find the file Project
 
 args = parser.parse_args()
 
-#Ex usage: python3 Make_job_busco.py -i /beegfs/home/bguinet/Species_genome_names.txt  -o $DIR/M2_script/Busco_jobs -p /beegfs/data/bguinet/
+#Ex usage: python3 Make_busco_jobs.py -i /beegfs/home/bguinet/Species_genome_names.txt  -o $DIR/M2_script/Busco_jobs -p /beegfs/data/bguinet/
 
 #This script allow you to create Busco_job.sh in order to run these scripts with slurm
 
