@@ -17,7 +17,7 @@ args = parser.parse_args()
 
 #Exemple usage : 
 
-#python3 Make_assembly_genome_stats_job.py -i /beegfs/data/bguinet/these/Species_genome_names.txt -p /beegfs/data/bguinet/these
+#python3 Make_assembly_genome_stat_jobs.py -i /beegfs/data/bguinet/these/Species_genome_names.txt -p /beegfs/data/bguinet/these
 # Variable that stores fasta sequences
 Species_name_file=args.species_name_file
 path=args.path
