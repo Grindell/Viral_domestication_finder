@@ -173,19 +173,21 @@ At the end of the process you should have the folowing message :
 
 Créer une base de donnée virale MMseqs2 avec l'ensemble des séquences protéiques virales: 
 #make mmseqs2 db for all viral proteins
-/beegfs/data/bguinet/TOOLS/MMseqs2/build/bin/mmseqs createdb /beegfs/data/bguinet/these/NCBI_protein_viruses/All_viral_protein_sequences_without_contamination_controls.fa /beegfs/data/bguinet/these/NCBI_protein_viruses/mmseqs2_viral_db
+ ```/beegfs/data/bguinet/TOOLS/MMseqs2/build/bin/mmseqs createdb /beegfs/data/bguinet/these/NCBI_protein_viruses/All_viral_protein_sequences_without_contamination_controls.fa /beegfs/data/bguinet/these/NCBI_protein_viruses/mmseqs2_viral_db ```
 
 #make an index 
-/beegfs/data/bguinet/TOOLS/MMseqs2/build/bin/mmseqs createindex /beegfs/data/bguinet/these/NCBI_protein_viruses/mmseqs2_viral_db /beegfs/data/bguinet/these/NCBI_protein_viruses/tmp
+ ```/beegfs/data/bguinet/TOOLS/MMseqs2/build/bin/mmseqs createindex /beegfs/data/bguinet/these/NCBI_protein_viruses/mmseqs2_viral_db /beegfs/data/bguinet/these/NCBI_protein_viruses/tmp ```
 
 
 #1) # Créer dans chacun des directory des Génomes d'espèces un fichier run_mmseqs2_V et Viral_mmseqs2_job.log
-for dir in */; do mkdir -p $dir/run_mmseqs2_V/Viral_mmseqs2_job.log/; done
+ ```for dir in */; do mkdir -p $dir/run_mmseqs2_V/Viral_mmseqs2_job.log/; done ```
 
 #2) python make_busco_files.py short_file_species_name.txt 
-python3 Make_job_mmseqs2.py -i /beegfs/home/bguinet/M2_script/file_all_species_name_and_outgroup.txt -t virus -db /beegfs/data/bguinet/M2/refseq/viral_queries_seq/mmseqs2_db -o ~/M2_script/mmseqs2_jobs
+ ```python3 Make_mmseqs2_jobs.py -i /beegfs/data/bguinet/these/Species_genome_names.txt -t virus -db /beegfs/data/bguinet/these/NCBI_protein_viruses/mmseqs2_viral_db -o /beegfs/home/bguinet/these_scripts/Mmseqs2_jobs -p /beegfs/data/bguinet/these ``` 
 
+puis on execute chaque fichier.sh:
 
+ ```for file in Viral_mmseqs2_job_*; do sbatch $file; done ```
 
 #Génération d'un fichier Matches_i.m8
 
