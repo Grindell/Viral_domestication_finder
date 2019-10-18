@@ -12,7 +12,7 @@ when executing scripts, then the results will be written at these paths.
 
 2) Une fois que tous les génomes sont téléchargés, il convient d'évaluer la qualité de l'assemblage de ces génomes: 
 
-Commencons par crée le répértoire qui recevra pour chaque génome les statistiques d'assemblage:
+Commencons par créer le répértoire qui recevra pour chaque génome les statistiques d'assemblage:
 
 ```for dir in /beegfs/data/bguinet/these/Genomes/*; do mkdir -p $dir/Genome_assembly_statistics; done```
 
