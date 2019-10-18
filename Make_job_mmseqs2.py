@@ -21,11 +21,8 @@ parser.add_argument("-o", "--out",help="The ouptut path where to create the slur
 parser.add_argument("-p", "--path",help="The path where to find the file Project")
 args = parser.parse_args()
 
-#Ex usage viral: python3 Make_job_diamond.py -i file_all_species_name.txt -t virus -db Diamond_virus_prot_db.dmnd -o ~/M2_script/Diamond_jobs
-#Ex usage busco: python3 Make_job_diamond.py -i file_all_species_name.txt -t hymenoptera -db Diamond_Busco_prot_db.dmnd -o ~/M2_script/Diamond_jobs
-#Ex usage busco: python3 Make_plast_job.py -i short_file_species_name.txt -t virus -db /beegfs/data/bguinet/M2/blast_db.pin -o ~/M2_script/mmseqs2_jobs
 
-#python3 Make_job_mmseqs2.py -i /beegfs/data/bguinet/these/Species_genome_names.txt -t virus -db /beegfs/data/bguinet/these/NCBI_protein_viruses/mmseqs2_viral_db -o /beegfs/home/bguinet/these_scripts/Mmseqs2_jobs -p /beegfs/data/bguinet/these 
+#python3 Make_mmseqs2_jobs.py -i /beegfs/data/bguinet/these/Species_genome_names.txt -t virus -db /beegfs/data/bguinet/these/NCBI_protein_viruses/mmseqs2_viral_db -o /beegfs/home/bguinet/these_scripts/Mmseqs2_jobs -p /beegfs/data/bguinet/these 
 
 
 # Variable that stores fasta sequences
