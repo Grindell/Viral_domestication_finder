@@ -9,7 +9,7 @@ then
 fi
 
 
-cat $2$3 | while read line; do python3 $2Create_bed_file.py --table $1${line}/Matches_${line}_without_overlapping_sequences.m8 --out $1${line}/Recover_fasta_loci.bed; echo $'\n';
+cat $2$3 | while read line; do python3 $2Make_bed_file.py --table $1${line}/Matches_${line}_without_overlapping_sequences.m8 --out $1${line}/Recover_fasta_loci.bed; echo $'\n';
 done 
 
 
