@@ -169,7 +169,7 @@ At the end of the process you should have the folowing message :
 #Recherche d'Homologie de séquence via MMseqs2. #
 #########
 
-![Image description](mmseqs2_step.png)
+![Image description](mmseqs_step.png)
 
 #Premier mmseqs2 query = genome ; db : virus protein sequences
 
