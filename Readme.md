@@ -224,3 +224,12 @@ puis on execute chaque fichier.sh:
 # Matches_Apis_mellifera_strand_V.m8 : un fichier avec les brains d'affichés ainsi que les coordonnées changées de sens 
 # Matches_",i,"_summary_V.txt : un fichier de type "seqnames" "start" "end" "width" "strand" "type" dans lequel les HSP sont rassemblés entre eux et ont une nouvelle coordonée 
 
+
+
+#Recupération de tous les locus selon leurs coordonées dans les génomes de chaque espèces dans un seul fichier All_fasta_viral_loci.fna
+
+![Image description](All_candidate_step.png)
+
+
+```bash Recover_loci_sequences.sh /beegfs/data/bguinet/M2/ /beegfs/home/bguinet/M2_script/ file_all_species_name_and_outgroup.txt```
+
