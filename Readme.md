@@ -231,5 +231,5 @@ puis on execute chaque fichier.sh:
 ![Image description](All_non_overlapping_candidate_step.png)
 
 
-```bash Recover_loci_sequences.sh /beegfs/data/bguinet/M2/ /beegfs/home/bguinet/M2_script/ file_all_species_name_and_outgroup.txt```
+```bash Recover_loci_sequences.sh /beegfs/data/bguinet/these/Genomes/ /beegfs/data/bguinet/these/Species_genome_names.txt```
 
