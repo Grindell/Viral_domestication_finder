@@ -233,3 +233,11 @@ puis on execute chaque fichier.sh:
 
 ```bash Recover_loci_sequences.sh /beegfs/data/bguinet/these/Genomes/ /beegfs/data/bguinet/these/Species_genome_names.txt```
 
+
+#Now we will perform a blastx with mmseqs2 with the viral protein db created earlier as db and our viral nucleotides loci as queries 
+
+![Image description](Pooling_candidate_step.png)
+
+
+sbatch Job_mmseqs2_Viralprot_vs_Viral_loci.sh
+
