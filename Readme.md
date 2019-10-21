@@ -228,7 +228,7 @@ puis on execute chaque fichier.sh:
 
 #Recupération de tous les locus selon leurs coordonées dans les génomes de chaque espèces dans un seul fichier All_fasta_viral_loci.fna
 
-![Image description](All_candidate_step.png)
+![Image description](All_non_overlapping_candidate_step.png)
 
 
 ```bash Recover_loci_sequences.sh /beegfs/data/bguinet/M2/ /beegfs/home/bguinet/M2_script/ file_all_species_name_and_outgroup.txt```
