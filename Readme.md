@@ -35,6 +35,9 @@ Le téléchargement impliquait le 07/10/19 1 471 031 séquences virales sous leu
 
 ###########Enlever les séquences RefSeq pouvant être des contaminantes#########
 
+
+![Image description](Viral_database_step.png)
+
 1) Sélectionner dans NCBI - protein le mot clé ex: familles de phages, polydnavirus ...
 2) Télacharger la liste d'accession 
 3) Fusionner toutes les listes en une seule : 
