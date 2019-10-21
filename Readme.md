@@ -236,7 +236,7 @@ puis on execute chaque fichier.sh:
 
 #Now we will perform a blastx with mmseqs2 with the viral protein db created earlier as db and our viral nucleotides loci as queries 
 
-![Image description](Pooling_candidate_step.png)
+![Image description](Pooling_candidates_step.png)
 
 
 sbatch Job_mmseqs2_Viralprot_vs_Viral_loci.sh
