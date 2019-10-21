@@ -169,6 +169,8 @@ At the end of the process you should have the folowing message :
 #Recherche d'Homologie de séquence via MMseqs2. #
 #########
 
+![Image description](mmseqs2_step.png)
+
 #Premier mmseqs2 query = genome ; db : virus protein sequences
 
 Créer une base de donnée virale MMseqs2 avec l'ensemble des séquences protéiques virales: 
