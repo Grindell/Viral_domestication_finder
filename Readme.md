@@ -193,4 +193,31 @@ puis on execute chaque fichier.sh:
 
 #Génération d'un fichier Matches_i.m8
 
-#récupération du tableau tblastn généré par busco directemnt inclu dans le fichier R Overlapping.R
+#récupération du tableau tblastn généré par busco directement inclu dans le fichier R Overlapping.R
+
+
+
+####################################################
+#Création des tables summary locus Virus et Hymeno.#
+####################################################
+
+# Ajout des brins et modification du sens des coordonées dans le fichier result_mmseqs2.m8
+
+#For refseq mmseqs2
+```cat /beegfs/data/bguinet/these/Species_genome_names.txt | while read line; do python3 Make_change_strand_blast.py -b /beegfs/data/bguinet/these/Genomes/${line}/run_mmseqs2_V/result_mmseqs2.m8 -o /beegfs/data/bguinet/these/Genomes/${line}/run_mmseqs2_V -t virus; done```
+
+#For busco tblastn tab (because busco already did a tblastn research, we will take it from the source)
+``` cat /beegfs/data/bguinet/these/Species_genome_names.txt | while read line; do python3 Make_change_strand_blast.py -b /beegfs/data/bguinet/these/Genomes/${line}/run_busco/run_BUSCO_v3/blast_output/tblastn_${line}_BUSCO_v3.tsv -o /beegfs/data/bguinet/these/Genomes/${line}/run_busco/run_BUSCO_v3/blast_output/ -t hymenoptera; done``` 
+
+#Génération d'un fichier result_mmseqs2_strand_V.m8" de type "query", "tlen", "target", "pident", "alnlen", "mismatch", "gapopen","qstart", "qend", "tstart", "tend", "evalue", "bits", "strand"
+
+![Image description](Overlapping_step.png)
+
+#Passer dans R, afin de lancer R sur le serveur utiliser /beegfs/data/soft/R-3.5.2/bin/R
+``` /beegfs/data/soft/R-3.5.2/bin/Rscript Overlapping_sequences.R /beegfs/data/bguinet/these/Species_genome_names.txt /beegfs/data/bguinet/these/Genomes/ #Permet d'executer le fichier . R``` 
+
+#Création in fine de : 
+
+# Matches_Apis_mellifera_strand_V.m8 : un fichier avec les brains d'affichés ainsi que les coordonnées changées de sens 
+# Matches_",i,"_summary_V.txt : un fichier de type "seqnames" "start" "end" "width" "strand" "type" dans lequel les HSP sont rassemblés entre eux et ont une nouvelle coordonée 
+
