@@ -285,14 +285,16 @@ L'idée est donc d'effectuer un nouveau silix avec un fichier tab blast ne conte
 This sequence (orphelins) presents no sufficient similarity with any sequence of the database, bNon-orphan families are all families containing at least two sequences
 
 #Only keep partials viral proteins (orphelins ones)
-```import pandas as pd
+
+```
+import pandas as pd 
 tab = pd.read_csv("/beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/seq_clusters_silix_stringent_all.fnodes",sep="\t",header=None)
 #In order to keep only lonely clusters: 
 df2 = tab[tab.groupby([0])[1].transform('size') == 1 ]
 df2 =df2[~df2[1].str.contains(":")] 
 with open("partials_locus_ids.txt","w") as file_partial_seq:
 for ids in df2[1]: 
-print(ids, file = file_partial_seq)```
+print(ids, file = file_partial_seq)``` 
 
 
 Maintenant nous avons un fichier partials_locus_ids.txt qui contient tous les ids des séquences partielles, il suffit alors de ne garder que toutes les lignes du fichier blast qui contiennent un hit avec ces séquences-là
@@ -398,5 +400,27 @@ sbatch $file;
 done
 
 
+#Now that we aligned each cluster, we will concatenate all HSP togethers:
+
+#Candidates HSPs are candidats that are in the same scaffold and same species, then they could be duplicates or HSPs. 
+#A HSP is defined when the ratio between number of AA matching with another AA / nb AA matching with a gap is < 0.20.
+
+python3 /beegfs/home/bguinet/M2_script/Merge_HSP_sequences_within_clusters.py -d /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/ -e .fa.aln
+
+#Then we align these new cluster once again:
+for file in /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/cluster_*.fa.aln_Hsp; do
+echo "/beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/run_Alignment.sh $file";
+done > clustal_locus_align_HSP.cmds
+python3 /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_script/makeAlignements_scripts_hsp.py 1 clustal_locus_align_HSP.cmds
+
+for file in Alignment_cluster_*_hsp.sh; do
+sbatch $file;
+done
+
+#Then we will rename these files in order to match the original cluster.aln name 
+for file in /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/cluster_*.fa.aln_Hsp.aln; do
+DEST=$(echo $file | sed 's/.fa.*/.fa.aln/')
+rm $DEST
+mv $file $DEST
 
 
