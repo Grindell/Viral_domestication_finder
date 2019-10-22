@@ -242,4 +242,4 @@ puis on execute chaque fichier.sh:
 sbatch Job_mmseqs2_Viralprot_vs_Viral_loci.sh
 
 
-[Image description](Silix_step2.png)
+[Image description](Silix_step2.jpg)
