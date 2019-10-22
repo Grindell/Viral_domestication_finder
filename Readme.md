@@ -234,12 +234,97 @@ puis on execute chaque fichier.sh:
 ```bash Recover_loci_sequences.sh /beegfs/data/bguinet/these/Genomes/ /beegfs/data/bguinet/these/Species_genome_names.txt```
 
 
-#Now we will perform a blastx with mmseqs2 with the viral protein db created earlier as db and our viral nucleotides loci as queries 
 
+
+#Clustering de gènes 
+
+Make a Viral_sequence_loci directory 
+
+```mkdir Viral_sequence_loci/mmseqs2_analysis```
+
+Make a Clustering directory 
+
+```mkdir /beegfs/data/bguinet/these/Clustering```
+
+Création d'un premier run silix sur le blast de tous les loci contre les séquences protéiques virals de manière très stringent. Ceci permet de trouver les loci dits "partielles", c'est à dire des locus ne répondant pas aux seuils imposés, il s'agira alors vraisemblablement de loci ayant des similarités ponctuelles le long des séquences, pouvant alors êtres intérpétés comme étant des domaines orthologues très conservés, néanmoins ce genre de domaines très conservés ne seront pas assignés dans la plus part des cas dans des clusters puisque leur score de couvertrure est très bas. Aussi, traiter ces séquences comme étant des séquences partielles, nous permettra avec silix de les ajouter aux clusters de manière postérieur et ainsi éviter de prendre en compte ces séquences partielles lors de la créations des clusters. 
+
+
+#First we will perform a blastx with mmseqs2 with the viral protein db created earlier as db and our viral nucleotides loci as queries 
 
 ![Image description](Silix_clustering_step1.png)
 
-sbatch Job_mmseqs2_Viralprot_vs_Viral_loci.sh
+(See if we have to split the data in order to be faster). 
+
+```sbatch Job_mmseqs2_Viralprot_vs_Viral_loci.sh```
+
+```for file in Job_mmseqs2_Viralprot_vs_Viral_loci_*.sh; do sbatch $file; done```
+
+```cat *.m8 > Matches_Viralprot_vs_Viral_loci_result_all.m8```
+
+
+#Change the order of the column len for silix 
+
+```awk  '{FS="\t"; OFS="\t"}{print $1, $2, $3*100, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13}' /beegfs/data/bguinet/these/Viral_sequence_loci/mmseqs2_analysis/Matches_Viralprot_vs_Viral_loci_result_all.m8 > /beegfs/data/bguinet/these/Viral_sequence_loci/mmseqs2_analysis/Matches_Viralprot_vs_Viral_loci_result2_all.m8```
 
 
 ![Image description](Silix_clustering_step2.png)
+
+Now we wil perform the first stringente silix clustering between Viral_seq_loci and the db 
+First we will recreate the first file wich serve to indicate the sequence length , so we cat aa and dna sequences together
+
+```cat /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/All_fasta_viral_loci.fna /beegfs/data/bguinet/these/NCBI_protein_viruses/All_viral_protein_sequences_without_contamination_controls.fa > /beegfs/data/bguinet/these/silix_concatenate_file_all.fa```
+
+run the silix mode with stringent obtions 
+```/beegfs/data/penel/programmes_ext/silix/silix-1.2.10-p1-simon/src/silix\ /beegfs/data/bguinet/these/silix_concatenate_file_all.fa\ /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/Matches_Viralprot_vs_Viral_loci_result2_all.m8\ -i 0.11 -r 1.2 --net -f cluster_  > /beegfs/data/bguinet/these/Genomes/Viral_sequences_loci/mmseqs2_analysis/seq_clusters_silix_stringent_all.fnodes```
+
+
+Une fois ce silix effectué, nous allons identifier tous les clusters étant orphelins (donc les séquences protéiques). Un deuxième silix va ensuite être effectué, en ne prenant en compte dans le fichier blast, uniquement les candidats matchant avec une séquence protéique virale partielle, les paramètres réglés à 0, nous pourrons alors ensuite obtenir les couvertures et identités calculés par silix et ensuite filtrer les séquences candidates partielles les plus probables, et les réjouter ensuite au cluster original. 
+
+L'idée est donc d'effectuer un nouveau silix avec un fichier tab blast ne contenant que les séquences dites partielles donc en éliminants tous les hits avec des protéines complettes. Pour cela nous devons identifier les séquences partielles. 
+
+This sequence (orphelins) presents no sufficient similarity with any sequence of the database, bNon-orphan families are all families containing at least two sequences
+
+#Only keep partials viral proteins (orphelins ones)
+```import pandas as pd
+tab = pd.read_csv("/beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/seq_clusters_silix_stringent_all.fnodes",sep="\t",header=None)
+#In order to keep only lonely clusters: 
+df2 = tab[tab.groupby([0])[1].transform('size') == 1 ]
+df2 =df2[~df2[1].str.contains(":")] 
+with open("partials_locus_ids.txt","w") as file_partial_seq:
+for ids in df2[1]: 
+print(ids, file = file_partial_seq)```
+
+
+Maintenant nous avons un fichier partials_locus_ids.txt qui contient tous les ids des séquences partielles, il suffit alors de ne garder que toutes les lignes du fichier blast qui contiennent un hit avec ces séquences-là
+
+```import pandas as pd
+blast_tab = pd.read_csv("Matches_Viralprot_vs_Viral_loci_result2_all.m8",header=None,sep="\t")
+vals = []
+with open('partials_locus_ids.txt', 'r') as a_file:
+for line in a_file: 
+vals.append(line.replace('\n',''))
+
+blast_partial = blast_tab.loc[blast_tab[1].isin(vals)]
+blast_partial.to_csv("Matches_Viralprot_vs_Viral_loci_result_partial.m8", sep='\t',header=None,index=False)```
+
+
+No we get a new blast tab file wich only contain hit with a partial sequence 
+
+The idea is now to make a silix run with 0 parameters and then only add the partials sequences in the clusters with a certain threshold 
+
+```/beegfs/data/penel/programmes_ext/silix/silix-1.2.10-p1-simon/src/silix\
+ /beegfs/data/bguinet/these/Viral_sequences_loci/silix_concatenate_file_all.fa\
+ /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/Matches_Viralprot_vs_Viral_loci_result_partial.m8\
+ -i 0 -r 0 --net -f cluster_  > /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/seq_clusters_silix_partials_all.fnodes```
+
+
+#No we will only keep partials sequences that have a cov >= 0.35 and then add them into the clusters and merge the fnode file with the blast file
+
+```python3 /beegfs/home/bguinet/M2_script/cluster_silix_merging.py
+ -b /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/Matches_Viralprot_vs_Viral_loci_result2_all.m8\
+ -c /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/seq_clusters_silix_with_partials_all.fnodes\
+ -p /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/Matches_Viralprot_vs_Viral_loci_result_partial.net\
+ -s /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/seq_clusters_silix_stringent_all.fnodes```
+
+
+
