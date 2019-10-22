@@ -327,4 +327,76 @@ The idea is now to make a silix run with 0 parameters and then only add the part
  -s /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/seq_clusters_silix_stringent_all.fnodes```
 
 
+#Now we will collect information about taxa ID and genomic environment 
+
+#################
+# GET TAXID INF #
+#################
+
+##1 create sqlit database using taxadb in order to recover the taxa informations
+```pip install taxadb```
+
+```/beegfs/data/bguinet/myconda/bin/taxadb download -o taxadb
+/beegfs/data/bguinet/myconda/bin/taxadb create -i taxadb --dbname taxadb.sqlite --fast```
+
+
+#Get TAxid of all target protein seqs and add it on the column in the mergeed silix_blast dataframe
+
+```python3 /beegfs/home/bguinet/M2_script/add_taxid_info.py -b /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/dataframe_brute.txt -d /beegfs/data/bguinet/taxadb.sqlite -o /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file.m8```
+
+# A file  Out_file.m8 will be generated with cluster and taxid informations added 
+
+
+#################
+# GET ENV INF   #
+#################
+
+```python3 /beegfs/home/bguinet/M2_script/Add_genomic_env.py -i /beegfs/home/bguinet/M2_script/file_all_species_name_and_outgroup.txt -b /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file.m8 -o /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file_env.m8```
+
+# A file  Out_file_env.m8 will be generated with cluster, taxid and genomic environment informations added .
+
+
+#############################
+# FILTERING OF CONTAMINANT. #
+#############################
+
+
+#In order to filter the possible contaminates we will do the following filtering on the candidats:
+
+```import pandas as pd 
+
+blast_tab = pd.read_csv("Out_file_env.m8",sep="\t")
+
+NB_cluster_before= blast_tab['cluster_names'].nunique()
+NB_scaff_before= blast_tab['query'].nunique()
+NB_proteins_before= blast_tab['target'].nunique()
+
+blast_tab = blast_tab[(blast_tab['pvalue_cov'] > 0.01) & (blast_tab['pvalue_gc'] > 0.01) & #Keep if the cov/gc pvalues  are both above 0.01
+ (blast_tab['Number_busco_loci'] >= 1) | #Keep in there is at least one busco in the same scaffold
+ (blast_tab['pvalue_cov'] > 0.01) | #Keep if the cov pvalue is above 0.01
+ (blast_tab['pvalue_cov'].isnull()) & (blast_tab['pvalue_gc'] > 0.05) ] #If there is no coverage value, then keep candidats with a high GC pvalue. 
+
+blast_tab[(blast_tab['pvalue_cov'].)]```
+
+
+
+
+#################################
+#####PHYLOGENY OF CLUSTERS.  ####
+#################################
+
+![Image description](Gene_phylogeny_step.png)
+
+#Alignment of each clusters
+for file in /beegfs/data/bguinet/M2/Gene_phylogeny/cluster_??????.fa ; do
+echo "/beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/run_Alignment.sh $file";
+done > clustal_locus_align.cmds
+python3 makeAlignements_scripts.py 10 clustal_locus_align.cmds
+
+for file in Alignment_cluster_*; do
+sbatch $file;
+done
+
+
+
 
