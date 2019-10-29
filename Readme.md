@@ -207,7 +207,7 @@ puis on execute chaque fichier.sh:
 # Ajout des brins et modification du sens des coordonées dans le fichier result_mmseqs2.m8
 
 
-![Image description](mmseqs_output_step)
+![Image description](mmseqs2_output_step)
 
 
 #For refseq mmseqs2
