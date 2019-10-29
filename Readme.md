@@ -206,6 +206,10 @@ puis on execute chaque fichier.sh:
 
 # Ajout des brins et modification du sens des coordonées dans le fichier result_mmseqs2.m8
 
+
+![Image description](mmseqs_output_step.png)
+
+
 #For refseq mmseqs2
 ```cat /beegfs/data/bguinet/these/Species_genome_names.txt | while read line; do python3 Make_change_strand_mmseqs2.py -b /beegfs/data/bguinet/these/Genomes/${line}/run_mmseqs2_V/result_mmseqs2.m8 -o /beegfs/data/bguinet/these/Genomes/${line}/run_mmseqs2_V -t virus; done```
 
