@@ -27,6 +27,10 @@ Executer tous les jobs pour calculer les statistiques d'assemblage:
 Ainsi avec QUAST, un nouveau répértoire : Genome_assembly_statistics est crée pour chacun des génomes
 
 
+#Nous allons maintenant rassembler toutes les statistiques des génomes dans un seul fichier txt :
+
+python3 Assembly_stat_summary.py /beegfs/data/bguinet/these/Species_genome_names.txt
+
 
 ##Telechargement des bases de données nécessaires :
 #NCBI viruses proteins database : https://www.ncbi.nlm.nih.gov/labs/virus/vssi/#/virus?SeqType_s=Protein&VirusLineage_ss=Viruses,%20taxid:10239
