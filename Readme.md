@@ -155,7 +155,7 @@ for dir in $DIR/Project/*; do mkdir -p $dir/run_busco/busco_job.log/; done
  ```mkdir $DIR/Project/Scripts_pipeline/Busco_jobs ```
 
 
- ```python3 Make_job_busco.py -i /beegfs/data/bguinet/these/Species_genome_names.txt  -o /beegfs/home/bguinet/these_scripts/Busco_jobs -p /beegfs/data/bguinet/these/ ```
+ ```python3 Make_busco_jobs.py -i /beegfs/data/bguinet/these/Species_genome_names.txt  -o /beegfs/home/bguinet/these_scripts/Busco_jobs -p /beegfs/data/bguinet/these/ ```
 
 At the end of the process you should have the folowing message : 
 ----------------------------------------------------------------
