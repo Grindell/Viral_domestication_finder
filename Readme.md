@@ -34,8 +34,20 @@ Ainsi avec QUAST, un nouveau répértoire : Genome_assembly_statistics est crée
 Un fichier table ```Assembly_summary.csv``` est généré. 
 
 #Nous allons maintenant rassembler toutes les statistiques BUSCO dans un seul fichier txt :
+python3 Busco_summary.py -i /beegfs/data/bguinet/these/Species_genome_names.txt  -o /beegfs/data/bguinet/these/Genomes/ -p /beegfs/data/bguinet/these/
 
+Un fichier table ```Busco_summary.csv``` est généré. 
 
+#Ensuite nous allons rassembler les informations BUSCO et les information des statistics d'assemblage:
+Dans python 
+```import pandas as pd
+Assembly = pd.read_csv("/beegfs/data/bguinet/these/Genomes/Assembly_summary.csv",sep="\t")
+Busco = pd.read_csv('/beegfs/data/bguinet/these/Genomes/Busco_summary.csv',sep='\t')
+result=pd.concat([Busco,Assembly],axis=1,join='inner')
+result= result.drop(['Unnamed: 0'],axis=1)
+result.to_csv('/beegfs/data/bguinet/these/Genomes/Busco_and_assembly_summary.csv',sep='\t')```
+
+Un fichier table ```Busco_and_assembly_summary.csv``` est généré. 
 
 ##Telechargement des bases de données nécessaires :
 #NCBI viruses proteins database : https://www.ncbi.nlm.nih.gov/labs/virus/vssi/#/virus?SeqType_s=Protein&VirusLineage_ss=Viruses,%20taxid:10239
