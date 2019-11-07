@@ -27,9 +27,14 @@ Executer tous les jobs pour calculer les statistiques d'assemblage:
 Ainsi avec QUAST, un nouveau répértoire : Genome_assembly_statistics est crée pour chacun des génomes
 
 
-#Nous allons maintenant rassembler toutes les statistiques des génomes dans un seul fichier txt :
+#Nous allons maintenant rassembler toutes les statistiques des génomes dans un seul fichier csv :
 
-python3 Assembly_stat_summary.py /beegfs/data/bguinet/these/Species_genome_names.txt
+```python3 Assembly_stat_summary.py /beegfs/data/bguinet/these/Species_genome_names.txt```
+
+Un fichier table ```Assembly_summary.csv``` est généré. 
+
+#Nous allons maintenant rassembler toutes les statistiques BUSCO dans un seul fichier txt :
+
 
 
 ##Telechargement des bases de données nécessaires :
