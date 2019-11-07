@@ -14,7 +14,7 @@ print('----------------------------------------------------------------\n')
 #----------------------------------- PARSE SOME ARGUMENTS ----------------------------------------
 parser = argparse.ArgumentParser(description='Allow to make busco jobs for slurm')
 parser.add_argument("-i", "--species_name_file", help="introduce the .txt file with all the species names")
-parser.add_argument("-o", "--out",help="The ouptut path where to create the slurm files")
+parser.add_argument("-o", "--out",help="The ouptut path where to create the output file")
 parser.add_argument("-p", "--path",help="The path where to find the file Project")
 
 args = parser.parse_args()
@@ -24,7 +24,7 @@ Species_name_file=args.species_name_file
 Output_path=args.out
 path=args.path
 
-#Ex: python3 Busco_summary.py -i /beegfs/data/bguinet/these/Species_genome_names.txt  -o /beegfs/home/bguinet/these_scripts/Busco_jobs -p /beegfs/data/bguinet/these/
+#python3 Busco_summary.py -i /beegfs/data/bguinet/these/Species_genome_names.txt  -o /beegfs/data/bguinet/these/Genomes/ -p /beegfs/data/bguinet/these/
 
 
 num_species = sum(1 for line in open(Species_name_file)) # count number of lines in the file in order to now the number of decimals / by the first number given
@@ -68,7 +68,7 @@ for names in list_of_names2:
 		df2=df2.append({'Species':names,'Complete':int(Number_complete_duplicated),'Duplicated':int(Number_Duplicated/2), 'Fragmented':int(Number_Fragmented),'Missing':int(Number_Missing),'Total':4415}, ignore_index=True)
 
 
-		df2.to_csv(Output_path,sep='\t')
+		df2.to_csv(Output_path+"Busco_summary.csv",sep='\t')
 	
 	except OSError as e:
 		print(names,"did not pass")
