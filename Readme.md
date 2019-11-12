@@ -3,53 +3,55 @@
 
 #Work in progress, all the code will be uploaded in few weeks with a tutorial.
 
-The developed pipeline involves the creation of certain files in well-established positions in the arborescence to ensure optimal fluidity
-when executing scripts, then the results will be written at these paths.
+The developed pipeline involves the creation of certain files in well-established positions in the arborescence to ensure optimal fluidity when executing scripts, then the results will be written at these paths.
 
 
-##Telechargement des Génomes 
-1) Cette étape peut être effectuée en téléchargeant les génomes qui nous intéressent sur une platforme de partage de génomes assemblés comme NCBI. 
+## Telechargement des Génomes 
+#### 1) Cette étape peut être effectuée en téléchargeant les génomes qui nous intéressent sur une platforme de partage de génomes assemblés comme NCBI. 
 
-2) Une fois que tous les génomes sont téléchargés, il convient d'évaluer la qualité de l'assemblage de ces génomes: 
+#### 2) Une fois que tous les génomes sont téléchargés, il convient d'évaluer la qualité de l'assemblage de ces génomes via des statistiques descriptives et la prévalence des gènes BUSCO: 
 
-Commencons par créer le répértoire qui recevra pour chaque génome les statistiques d'assemblage:
+2.1. **Statistiques descriptives d'assemblage**
+
+- Commencons par créer le répértoire qui recevra pour chaque génome les statistiques d'assemblage:
 
 ```for dir in /beegfs/data/bguinet/these/Genomes/*; do mkdir -p $dir/Genome_assembly_statistics; done```
 
-Executons ensuite un script pour créer des jobs python qui seront lancé sur slurm:
-
+- Executons ensuite un script pour créer des jobs python qui seront lancés sur slurm:
 ```python3 ~/these_scripts/Make_assembly_genome_stats_job.py -i /beegfs/data/bguinet/these/Species_genome_names.txt -p /beegfs/data/bguinet/these```
 
-Executer tous les jobs pour calculer les statistiques d'assemblage:
+- Executer tous les jobs pour calculer les statistiques d'assemblage:
 ```for file in Assembly_stat_job_*; do sbatch $file; done```
 
+- Ainsi avec *QUAST*, un nouveau répértoire : **/Genome_assembly_statistics/** est crée pour chacun des génomes.
 
-Ainsi avec QUAST, un nouveau répértoire : Genome_assembly_statistics est crée pour chacun des génomes
-
-
-#Nous allons maintenant rassembler toutes les statistiques des génomes dans un seul fichier csv :
+- Nous allons maintenant rassembler toutes les statistiques des génomes dans un seul fichier csv :
 
 ```python3 Assembly_stat_summary.py /beegfs/data/bguinet/these/Species_genome_names.txt```
 
-Un fichier table ```Assembly_summary.csv``` est généré. 
+- Un fichier table *Assembly_summary.csv* est généré. 
 
-#Nous allons maintenant rassembler toutes les statistiques BUSCO dans un seul fichier txt :
-python3 Busco_summary.py -i /beegfs/data/bguinet/these/Species_genome_names.txt  -o /beegfs/data/bguinet/these/Genomes/ -p /beegfs/data/bguinet/these/
+   
+2.2. **Statistiques descriptives BUSCO** : 
+- Nous allons maintenant rassembler toutes les statistiques BUSCO dans un seul fichier txt :
+```python3 Busco_summary.py -i /beegfs/data/bguinet/these/Species_genome_names.txt  -o /beegfs/data/bguinet/these/Genomes/ -p /beegfs/data/bguinet/these/```
 
-Un fichier table ```Busco_summary.csv``` est généré. 
+- Un fichier table *Busco_summary.csv* est généré. 
 
-#Ensuite nous allons rassembler les informations BUSCO et les information des statistics d'assemblage:
-Dans python 
+2.3. **Ensuite nous allons rassembler les informations BUSCO et les information des statistics d'assemblage dans python :**
 ```import pandas as pd
 Assembly = pd.read_csv("/beegfs/data/bguinet/these/Genomes/Assembly_summary.csv",sep="\t")
 Busco = pd.read_csv('/beegfs/data/bguinet/these/Genomes/Busco_summary.csv',sep='\t')
 result=pd.concat([Busco,Assembly],axis=1,join='inner')
 result= result.drop(['Unnamed: 0'],axis=1)
-result.to_csv('/beegfs/data/bguinet/these/Genomes/Busco_and_assembly_summary.csv',sep='\t')```
+result.to_csv('/beegfs/data/bguinet/these/Genomes/Busco_and_assembly_summary.csv',sep='\t')
+```
 
-Un fichier table ```Busco_and_assembly_summary.csv``` est généré. 
+- Un fichier table *Busco_and_assembly_summary.csv* est généré. 
 
-##Telechargement des bases de données nécessaires :
+
+
+## Télechargement des bases de données nécessaires :
 #NCBI viruses proteins database : https://www.ncbi.nlm.nih.gov/labs/virus/vssi/#/virus?SeqType_s=Protein&VirusLineage_ss=Viruses,%20taxid:10239
 
 Le téléchargement impliquait le 07/10/19 1 471 031 séquences virales sous leurs formes protéiques. 
