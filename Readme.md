@@ -320,7 +320,8 @@ df2 = tab[tab.groupby([0])[1].transform('size') == 1 ]
 df2 =df2[~df2[1].str.contains(":")] 
 with open("partials_locus_ids.txt","w") as file_partial_seq:
 for ids in df2[1]: 
-print(ids, file = file_partial_seq)``` 
+print(ids, file = file_partial_seq)
+```
 
 
 Maintenant nous avons un fichier partials_locus_ids.txt qui contient tous les ids des séquences partielles, il suffit alors de ne garder que toutes les lignes du fichier blast qui contiennent un hit avec ces séquences-là
@@ -333,8 +334,8 @@ for line in a_file:
 vals.append(line.replace('\n',''))
 
 blast_partial = blast_tab.loc[blast_tab[1].isin(vals)]
-blast_partial.to_csv("Matches_Viralprot_vs_Viral_loci_result_partial.m8", sep='\t',header=None,index=False)```
-
+blast_partial.to_csv("Matches_Viralprot_vs_Viral_loci_result_partial.m8", sep='\t',header=None,index=False)
+```
 
 No we get a new blast tab file wich only contain hit with a partial sequence 
 
@@ -343,45 +344,47 @@ The idea is now to make a silix run with 0 parameters and then only add the part
 ```/beegfs/data/penel/programmes_ext/silix/silix-1.2.10-p1-simon/src/silix\
  /beegfs/data/bguinet/these/Viral_sequences_loci/silix_concatenate_file_all.fa\
  /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/Matches_Viralprot_vs_Viral_loci_result_partial.m8\
- -i 0 -r 0 --net -f cluster_  > /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/seq_clusters_silix_partials_all.fnodes```
-
-
-#No we will only keep partials sequences that have a cov >= 0.35 and then add them into the clusters and merge the fnode file with the blast file
+ -i 0 -r 0 --net -f cluster_  > /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/seq_clusters_silix_partials_all.fnodes
+```
+No we will only keep partials sequences that have a cov >= 0.35 and then add them into the clusters and merge the fnode file with the blast file
 
 ```python3 /beegfs/home/bguinet/M2_script/cluster_silix_merging.py
  -b /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/Matches_Viralprot_vs_Viral_loci_result2_all.m8\
  -c /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/seq_clusters_silix_with_partials_all.fnodes\
  -p /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/Matches_Viralprot_vs_Viral_loci_result_partial.net\
- -s /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/seq_clusters_silix_stringent_all.fnodes```
+ -s /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/seq_clusters_silix_stringent_all.fnodes
+```
 
-
-#Now we will collect information about taxa ID and genomic environment 
+Now we will collect information about taxa ID and genomic environment 
 
 #################
 # GET TAXID INF #
 #################
 
-##1 create sqlit database using taxadb in order to recover the taxa informations
+1 create sqlit database using taxadb in order to recover the taxa informations
 ```pip install taxadb```
 
 ```/beegfs/data/bguinet/myconda/bin/taxadb download -o taxadb
-/beegfs/data/bguinet/myconda/bin/taxadb create -i taxadb --dbname taxadb.sqlite --fast```
+/beegfs/data/bguinet/myconda/bin/taxadb create -i taxadb --dbname taxadb.sqlite --fast
+```
 
 
-#Get TAxid of all target protein seqs and add it on the column in the mergeed silix_blast dataframe
+Get TAxid of all target protein seqs and add it on the column in the mergeed silix_blast dataframe
 
-```python3 /beegfs/home/bguinet/M2_script/add_taxid_info.py -b /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/dataframe_brute.txt -d /beegfs/data/bguinet/taxadb.sqlite -o /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file.m8```
+```python3 /beegfs/home/bguinet/M2_script/add_taxid_info.py -b /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/dataframe_brute.txt -d /beegfs/data/bguinet/taxadb.sqlite -o /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file.m8
+```
 
-# A file  Out_file.m8 will be generated with cluster and taxid informations added 
+A file  Out_file.m8 will be generated with cluster and taxid informations added 
 
 
 #################
 # GET ENV INF   #
 #################
 
-```python3 /beegfs/home/bguinet/M2_script/Add_genomic_env.py -i /beegfs/home/bguinet/M2_script/file_all_species_name_and_outgroup.txt -b /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file.m8 -o /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file_env.m8```
+```python3 /beegfs/home/bguinet/M2_script/Add_genomic_env.py -i /beegfs/home/bguinet/M2_script/file_all_species_name_and_outgroup.txt -b /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file.m8 -o /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file_env.m8
+```
 
-# A file  Out_file_env.m8 will be generated with cluster, taxid and genomic environment informations added .
+A file  Out_file_env.m8 will be generated with cluster, taxid and genomic environment informations added .
 
 
 #############################
@@ -404,7 +407,8 @@ blast_tab = blast_tab[(blast_tab['pvalue_cov'] > 0.01) & (blast_tab['pvalue_gc']
  (blast_tab['pvalue_cov'] > 0.01) | #Keep if the cov pvalue is above 0.01
  (blast_tab['pvalue_cov'].isnull()) & (blast_tab['pvalue_gc'] > 0.05) ] #If there is no coverage value, then keep candidats with a high GC pvalue. 
 
-blast_tab[(blast_tab['pvalue_cov'].)]```
+blast_tab[(blast_tab['pvalue_cov'].)]
+```
 
 
 
@@ -415,8 +419,8 @@ blast_tab[(blast_tab['pvalue_cov'].)]```
 
 ![Image description](Gene_phylogeny_step.png)
 
-#Alignment of each clusters
-for file in /beegfs/data/bguinet/M2/Gene_phylogeny/cluster_??????.fa ; do
+Alignment of each clusters
+```for file in /beegfs/data/bguinet/M2/Gene_phylogeny/cluster_??????.fa ; do
 echo "/beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/run_Alignment.sh $file";
 done > clustal_locus_align.cmds
 python3 makeAlignements_scripts.py 10 clustal_locus_align.cmds
@@ -424,17 +428,18 @@ python3 makeAlignements_scripts.py 10 clustal_locus_align.cmds
 for file in Alignment_cluster_*; do
 sbatch $file;
 done
+```
 
+Now that we aligned each cluster, we will concatenate all HSP togethers:
 
-#Now that we aligned each cluster, we will concatenate all HSP togethers:
+Candidates HSPs are candidats that are in the same scaffold and same species, then they could be duplicates or HSPs. 
+A HSP is defined when the ratio between number of AA matching with another AA / nb AA matching with a gap is < 0.20.
 
-#Candidates HSPs are candidats that are in the same scaffold and same species, then they could be duplicates or HSPs. 
-#A HSP is defined when the ratio between number of AA matching with another AA / nb AA matching with a gap is < 0.20.
+```python3 /beegfs/home/bguinet/M2_script/Merge_HSP_sequences_within_clusters.py -d /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/ -e .fa.aln
+```
 
-python3 /beegfs/home/bguinet/M2_script/Merge_HSP_sequences_within_clusters.py -d /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/ -e .fa.aln
-
-#Then we align these new cluster once again:
-for file in /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/cluster_*.fa.aln_Hsp; do
+Then we align these new cluster once again:
+```for file in /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/cluster_*.fa.aln_Hsp; do
 echo "/beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/run_Alignment.sh $file";
 done > clustal_locus_align_HSP.cmds
 python3 /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_script/makeAlignements_scripts_hsp.py 1 clustal_locus_align_HSP.cmds
@@ -442,11 +447,12 @@ python3 /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_script/makeAlignements_
 for file in Alignment_cluster_*_hsp.sh; do
 sbatch $file;
 done
+```
 
-#Then we will rename these files in order to match the original cluster.aln name 
-for file in /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/cluster_*.fa.aln_Hsp.aln; do
+Then we will rename these files in order to match the original cluster.aln name 
+```for file in /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/cluster_*.fa.aln_Hsp.aln; do
 DEST=$(echo $file | sed 's/.fa.*/.fa.aln/')
 rm $DEST
 mv $file $DEST
-
+```
 
