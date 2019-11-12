@@ -6,7 +6,7 @@
 The developed pipeline involves the creation of certain files in well-established positions in the arborescence to ensure optimal fluidity when executing scripts, then the results will be written at these paths.
 
 
-## Telechargement des Génomes 
+## Télechargement des Génomes 
 #### 1) Cette étape peut être effectuée en téléchargeant les génomes qui nous intéressent sur une platforme de partage de génomes assemblés comme NCBI. 
 
 #### 2) Une fois que tous les génomes sont téléchargés, il convient d'évaluer la qualité de l'assemblage de ces génomes via des statistiques descriptives et la prévalence des gènes BUSCO: 
@@ -14,7 +14,6 @@ The developed pipeline involves the creation of certain files in well-establishe
 2.1. **Statistiques descriptives d'assemblage**
 
 - Commencons par créer le répértoire qui recevra pour chaque génome les statistiques d'assemblage:
-
 ```for dir in /beegfs/data/bguinet/these/Genomes/*; do mkdir -p $dir/Genome_assembly_statistics; done```
 
 - Executons ensuite un script pour créer des jobs python qui seront lancés sur slurm:
@@ -26,7 +25,6 @@ The developed pipeline involves the creation of certain files in well-establishe
 - Ainsi avec *QUAST*, un nouveau répértoire : **/Genome_assembly_statistics/** est crée pour chacun des génomes.
 
 - Nous allons maintenant rassembler toutes les statistiques des génomes dans un seul fichier csv :
-
 ```python3 Assembly_stat_summary.py /beegfs/data/bguinet/these/Species_genome_names.txt```
 
 - Un fichier table *Assembly_summary.csv* est généré. 
@@ -51,53 +49,55 @@ result.to_csv('/beegfs/data/bguinet/these/Genomes/Busco_and_assembly_summary.csv
 
 
 
-## Télechargement des bases de données nécessaires :
-#NCBI viruses proteins database : https://www.ncbi.nlm.nih.gov/labs/virus/vssi/#/virus?SeqType_s=Protein&VirusLineage_ss=Viruses,%20taxid:10239
+## Télechargement des bases de données et purge des contaminants (séquences protéiques virales) :
+**NCBI viruses proteins database :** https://www.ncbi.nlm.nih.gov/labs/virus/vssi/#/virus?SeqType_s=Protein&VirusLineage_ss=Viruses,%20taxid:10239
 
-Le téléchargement impliquait le 07/10/19 1 471 031 séquences virales sous leurs formes protéiques. 
+* *Le téléchargement impliquait le 07/10/19 **1 471 031 séquences virales** sous leurs formes protéiques.* *
 
-###########Enlever les séquences RefSeq pouvant être des contaminantes#########
+
+### Purge des séquences contaminantes 
 
 
 ![Image description](Viruses_database_step.png)
 
-1) Sélectionner dans NCBI - protein le mot clé ex: familles de phages, polydnavirus ...
-2) Télacharger la liste d'accession 
-3) Fusionner toutes les listes en une seule : 
+##### 1) Sélectionner dans NCBI - protein le mot clé ex: familles de phages, polydnavirus ...
+##### 2) Télacharger la liste d'accession 
+##### 3) Fusionner toutes les listes en une seule : 
 
 ```cat liste1.txt liste2.txt liste3.txt > liste_complette_conta_access_number.txt```
 
-4) Eliminer les séquences Fasta ayant leur ID représenté dans la liste : "All_phages_and_polydnaviridae_families_conta.txt" :
+##### 4) Eliminer les séquences Fasta ayant leur ID représenté dans la liste : **All_phages_and_polydnaviridae_families_conta.txt** :
 
 Permet à partir d'un liste d'ID, de supprimer toutes les séquences d'un fichier fasta qui sont dans celle liste et d'ajouter les nouvelles séquences dans un nouveau fichier fasta.
-
-
 ```Purge_fasta_file.py -c /beegfs/data/bguinet/these/NCBI_protein_viruses/All_phages_and_polydnaviridae_families_conta.txt -f /beegfs/data/bguinet/these/NCBI_protein_viruses/All_viral_protein_sequences.fa -o /beegfs/data/bguinet/these/NCBI_protein_viruses/All_viral_protein_sequences_without_contamination.fa ```
 
 
-5) Nous allons ajouter maintenant les contrôles positifs, c'est à dire les séquences déjà connues pour avoir été dommestiquées par des génomes eucaryotes. Nous allons également les targeter. 
+##### 5) Nous allons ajouter maintenant les **contrôles positifs**, c'est à dire les séquences déjà connues pour avoir été dommestiquées par des génomes eucaryotes. Nous allons également leur ajouter un TAG **(_CP)**. 
 
-Il faut déjà récupérer toutes ces séquences et les mettre dans un fichier fasta: Positif_controls_viral_domestication.fa
-Nous allons ensuite targeter ces séquences avec le dénomination_CP pour Crontrôle positif :
+Il faut déjà récupérer toutes ces séquences et les mettre dans un fichier fasta: **Positif_controls_viral_domestication.fa**
+Nous allons ensuite targeter ces séquences avec le dénomination **_CP** pour Crontrôle positif :
 
 ```awk '/^>/{$1=$1"_CP"} 1' Positif_controls_viral_domestication.fa > Positif_controls_viral_domestication_targeted.fa```
-```Explanation
+```
+Explanation
 awk '            ##Starting awk program here.
 /^>/{            ##Checking condition if a line starts from > then do following.
   $1=$1"_CT"     ##Setting value of $1 to $1 and concatenating _CT to it too.
 }                ##Closing BLOCK for this condition here.
 1                ##Mentioning 1 will print edited/non-edited line.
 ' Input_file     ##Mentioning Input_file name here.
+
+Positif_controls_viral_domestication_targeted.fa
 ```
-> Positif_controls_viral_domestication_targeted.fa
 
-cat All_viral_protein_sequences_without_contamination.fa Positif_controls_viral_domestication_targeted.fa > All_viral_protein_sequences_without_contamination_controls.fa
+```cat All_viral_protein_sequences_without_contamination.fa Positif_controls_viral_domestication_targeted.fa > All_viral_protein_sequences_without_contamination_controls.fa```
 
-6) Vérifier qu'il n'y ait pas de séquences dupliquées : 
-
+#### 6) Vérifier qu'il n'y ait pas de séquences dupliquées : 
 
 
-#Bien débuter commence par bien organiser son espace de travail 
+
+
+## Organiser son espace de travail 
 First of all the user will have to make a file in which will be present all the genomes that he wants to study in format: Genus_species.fa
 in the format : 
 
@@ -144,49 +144,40 @@ This will creates:
 * And each directory with ```the Genus_species name```. 
 
 
-#Recherche de gènes BUSCO pour chacun des génomes. #
-####################################################
+## Recherche de gènes BUSCO pour chacun des génomes. 
 
-Nous allons maintenant pour chacun des Génome, lui créer des fichiers Busco (run_busco) dans lesquels seront adressés tous les résultats des recherches BUSCO 
+Nous allons maintenant pour chacun des **thèse/Génomes/**, créer des fichiers Busco **run_busco** dans lesquels seront adressés tous les résultats des recherches BUSCO 
 
 
-# Créer dans chacun des directory d'espèce une fichier run_busco qui contiendra les résultats du run avec BUSCO.V3 ainsi qu'un répertoire pour les logs
-for dir in $DIR/Project/*; do mkdir -p $dir/run_busco/busco_job.log/; done
+#### 1) Créer dans chacun des directory d'espèce une fichier run_busco qui contiendra les résultats du run avec BUSCO.V3 ainsi qu'un répertoire pour les logs
+```for dir in $DIR/Project/*; do mkdir -p $dir/run_busco/busco_job.log/; done```
 
-#2) Ensuite, créer des fichiers jobs Busco pour chacune de ces espèces et l'ajouter dans le fichier Busco_jobs
+#### 2) Ensuite, créer des fichiers jobs Busco pour chacune de ces espèces et l'ajouter dans le fichier * *Busco_jobs* * (avec les paramètres souhaités à modifier directement dans le fichier * *Make_busco_jobs.py**.
  ```mkdir $DIR/Project/Scripts_pipeline/Busco_jobs ```
-
 
  ```python3 Make_busco_jobs.py -i /beegfs/data/bguinet/these/Species_genome_names.txt  -o /beegfs/home/bguinet/these_scripts/Busco_jobs -p /beegfs/data/bguinet/these/ ```
 
 At the end of the process you should have the folowing message : 
-----------------------------------------------------------------
 
-                        Busco_job_maker.
-
-----------------------------------------------------------------
-
-[==================================================] 100.0% finish
-
-132  files created at : /beegfs/home/bguinet/these_scripts/Busco_jobs
+132  files created at : **/beegfs/home/bguinet/these_scripts/Busco_jobs**
 
 
-#3) Executer ensuite chacun de ces jobs 
+#### 3) Executer ensuite chacun de ces jobs sur slurm 
  ```for file in $DIR/Project/Busco_job*; do sbatch $file; done ```
 
-#4) Pour chacun des fichiers de chaque espèce, rassembler les séquences protéiques et nucléiques ensembles
-# 4.1) Créer un directory receveur pour les séquences prot et nucl
+#### 4) Pour chacun des fichiers de chaque espèce, rassembler les séquences protéiques et nucléiques ensembles
+##### 4.1) Créer un directory receveur pour les séquences prot et nucl
  ```cat /beegfs/data/bguinet/these/Species_genome_names.txt | while read line; do  mkdir /beegfs/data/bguinet/these/Genomes/${line}/run_busco/run_${line}_BUSCO_v3/single_copy_busco_sequences/single_copy_busco_proteins; done ```
  ```cat /beegfs/data/bguinet/these/Species_genome_names.txt | while read line; do  mkdir /beegfs/data/bguinet/these/Genomes/${line}/run_busco/run_${line}_BUSCO_v3/single_copy_busco_sequences/single_copy_busco_nucleotides; done ```
 
-# 4.2) Déplacer toutes les séquences dans les bon fichiers correspondants 
+##### 4.2) Déplacer toutes les séquences dans les bon fichiers correspondants 
  ```cat /beegfs/data/bguinet/these/Species_genome_names.txt | while read line; do mv -v /beegfs/data/bguinet/these/Genomes/${line}/run_busco/run_${line}_BUSCO_v3/single_copy_busco_sequences/*.faa /beegfs/data/bguinet/these/Genomes/${line}/run_busco/run_${line}_BUSCO_v3/single_copy_busco_sequences/single_copy_busco_proteins/; done ```
  ```cat /beegfs/data/bguinet/these/Species_genome_names.txt | while read line; do mv -v $DIR/Project/M2/${line}/run_busco/run_${line}_BUSCO_v3/single_copy_busco_sequences/*.fna /beegfs/data/bguinet/these/Genomes/${line}/run_busco/run_${line}_BUSCO_v3/single_copy_busco_sequences/single_copy_busco_nucleotides/; done ```
 
-# Etape pour créer la base de donnée mmseqs2 et permet également d'alleger le nom des séquences busco (attention étape non complette dans la suite pour 5espèces)
+#### Etape pour créer la base de donnée mmseqs2 et permet également d'alleger le nom des séquences busco (attention étape non complette dans la suite pour 5espèces)
  ```cat /beegfs/data/bguinet/these/Species_genome_names.txt | while read line; do sed -i 's@:/beegfs/data/bguinet/these/Genomes/${line}/${line}.fa@@g' /beegfs/data/bguinet/these/Genomes/${line}/run_busco/run_BUSCO_v3/compiled_busco_aa ```
 
-# 5) Récupérer un summary de tous les busco générés 
+#### 5) Récupérer un summary de tous les busco générés 
  ```python3 /beegfs/home/bguinet/M2_script/Busco_summary.py /beegfs/data/bguinet/these/Species_genome_names.txt ```
 
 
