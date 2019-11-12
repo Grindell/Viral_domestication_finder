@@ -177,98 +177,86 @@ At the end of the process you should have the folowing message :
 #### Etape pour créer la base de donnée mmseqs2 et permet également d'alleger le nom des séquences busco (attention étape non complette dans la suite pour 5espèces)
  ```cat /beegfs/data/bguinet/these/Species_genome_names.txt | while read line; do sed -i 's@:/beegfs/data/bguinet/these/Genomes/${line}/${line}.fa@@g' /beegfs/data/bguinet/these/Genomes/${line}/run_busco/run_BUSCO_v3/compiled_busco_aa ```
 
-#### 5) Récupérer un summary de tous les busco générés 
- ```python3 /beegfs/home/bguinet/M2_script/Busco_summary.py /beegfs/data/bguinet/these/Species_genome_names.txt ```
 
 
-
-#########
-#Recherche d'Homologie de séquence via MMseqs2. #
-#########
+## Recherche d'Homologie de séquence via MMseqs2 pour chacun des génomes. 
 
 ![Image description](mmseqs_step.png)
 
-#Premier mmseqs2 query = genome ; db : virus protein sequences
+Premier mmseqs2 query = genome ; db : virus protein sequences
 
-Créer une base de donnée virale MMseqs2 avec l'ensemble des séquences protéiques virales: 
+#### 1) Créer une base de donnée virale MMseqs2 avec l'ensemble des séquences protéiques virales: 
 #make mmseqs2 db for all viral proteins
  ```/beegfs/data/bguinet/TOOLS/MMseqs2/build/bin/mmseqs createdb /beegfs/data/bguinet/these/NCBI_protein_viruses/All_viral_protein_sequences_without_contamination_controls.fa /beegfs/data/bguinet/these/NCBI_protein_viruses/mmseqs2_viral_db ```
 
-#make an index 
+#### 2)make an index 
  ```/beegfs/data/bguinet/TOOLS/MMseqs2/build/bin/mmseqs createindex /beegfs/data/bguinet/these/NCBI_protein_viruses/mmseqs2_viral_db /beegfs/data/bguinet/these/NCBI_protein_viruses/tmp ```
 
-
-#1) # Créer dans chacun des directory des Génomes d'espèces un fichier run_mmseqs2_V et Viral_mmseqs2_job.log
+#### 3) Créer dans chacun des directory des Génomes d'espèces un fichier run_mmseqs2_V et Viral_mmseqs2_job.log
  ```for dir in */; do mkdir -p $dir/run_mmseqs2_V/Viral_mmseqs2_job.log/; done ```
 
-#2) python make_busco_files.py short_file_species_name.txt 
+#### 4) python make_busco_files.py short_file_species_name.txt 
  ```python3 Make_mmseqs2_jobs.py -i /beegfs/data/bguinet/these/Species_genome_names.txt -t virus -db /beegfs/data/bguinet/these/NCBI_protein_viruses/mmseqs2_viral_db -o /beegfs/home/bguinet/these_scripts/Mmseqs2_jobs -p /beegfs/data/bguinet/these ``` 
 
-puis on execute chaque fichier.sh:
+#### 5) puis on execute chaque fichier.sh:
 
  ```for file in Viral_mmseqs2_job_*; do sbatch $file; done ```
 
-#Génération d'un fichier Matches_i.m8
+Génération d'un fichier **Matches_i.m8** par génome.
 
-#récupération du tableau tblastn généré par busco directement inclu dans le fichier R Overlapping.R
+## récupération du tableau tblastn généré par busco directement inclu dans le fichier R Overlapping.R
 
 
+## Création des tables summary locus Virus et Hymenoptères
 
-####################################################
-#Création des tables summary locus Virus et Hymeno.#
-####################################################
-
-# Ajout des brins et modification du sens des coordonées dans le fichier result_mmseqs2.m8
-
+#### 1) Ajout des brins et modification du sens des coordonées dans le fichier result_mmseqs2.m8
 
 ![Image description](mmseqs2_output_step)
 
 
-#For refseq mmseqs2
+#### 2) For refseq mmseqs2
 ```cat /beegfs/data/bguinet/these/Species_genome_names.txt | while read line; do python3 Make_change_strand_mmseqs2.py -b /beegfs/data/bguinet/these/Genomes/${line}/run_mmseqs2_V/result_mmseqs2.m8 -o /beegfs/data/bguinet/these/Genomes/${line}/run_mmseqs2_V -t virus; done```
 
-#For busco tblastn tab (because busco already did a tblastn research, we will take it from the source)
+#### 3) For busco tblastn tab (because busco already did a tblastn research, we will take it from the source)
 ``` cat /beegfs/data/bguinet/these/Species_genome_names.txt | while read line; do python3 Make_change_strand_mmseqs2.py -b /beegfs/data/bguinet/these/Genomes/${line}/run_busco/run_BUSCO_v3/blast_output/tblastn_${line}_BUSCO_v3.tsv -o /beegfs/data/bguinet/these/Genomes/${line}/run_busco/run_BUSCO_v3/blast_output/ -t hymenoptera; done``` 
 
-#Génération d'un fichier result_mmseqs2_strand_V.m8" de type 
+Génération d'un fichier **result_mmseqs2_strand_V.m8** de type :
 ```"query", "tlen", "target", "pident", "alnlen", "mismatch", "gapopen","qstart", "qend", "tstart", "tend", "evalue", "bits", "strand"```
 
 ![Image description](Overlapping_step.png)
 
-#Passer dans R, afin de lancer R sur le serveur utiliser /beegfs/data/soft/R-3.5.2/bin/R
+#### 4) Passer dans R, afin de lancer R sur le serveur utiliser */beegfs/data/soft/R-3.5.2/bin/R
 ``` /beegfs/data/soft/R-3.5.2/bin/Rscript Overlapping_sequences.R /beegfs/data/bguinet/these/Species_genome_names.txt /beegfs/data/bguinet/these/Genomes/ #Permet d'executer le fichier . R``` 
 
-#Création in fine de : 
+Création in fine de : 
 
-# Matches_Apis_mellifera_strand_V.m8 : un fichier avec les brains d'affichés ainsi que les coordonnées changées de sens 
-# Matches_",i,"_summary_V.txt : un fichier de type "seqnames" "start" "end" "width" "strand" "type" dans lequel les HSP sont rassemblés entre eux et ont une nouvelle coordonée 
+**Matches_Apis_mellifera_strand_V.m8** : un fichier avec les brains d'affichés ainsi que les coordonnées changées de sens 
+**Matches_",i,"_summary_V.txt** : un fichier de type "seqnames" "start" "end" "width" "strand" "type" dans lequel les HSP sont rassemblés entre eux et ont une nouvelle coordonée 
 
 
-
-#Recupération de tous les locus selon leurs coordonées dans les génomes de chaque espèces dans un seul fichier All_fasta_viral_loci.fna
+Recupération de tous les locus selon leurs coordonées dans les génomes de chaque espèces dans un seul fichier **All_fasta_viral_loci.fna**
 
 ![Image description](All_non_overlapping_candidate_step.png)
-
 
 ```bash Recover_loci_sequences.sh /beegfs/data/bguinet/these/Genomes/ /beegfs/data/bguinet/these/Species_genome_names.txt```
 
 
 
 
-#Clustering de gènes 
+## Clustering de gènes 
 
-Make a Viral_sequence_loci directory 
+##### 1) Make a Viral_sequence_loci directory 
 
 ```mkdir Viral_sequence_loci/mmseqs2_analysis```
 
-Make a Clustering directory 
+##### 2) Make a Clustering directory 
 
 ```mkdir /beegfs/data/bguinet/these/Clustering```
 
-Création d'un premier run silix sur le blast de tous les loci contre les séquences protéiques virals de manière très stringent. Ceci permet de trouver les loci dits "partielles", c'est à dire des locus ne répondant pas aux seuils imposés, il s'agira alors vraisemblablement de loci ayant des similarités ponctuelles le long des séquences, pouvant alors êtres intérpétés comme étant des domaines orthologues très conservés, néanmoins ce genre de domaines très conservés ne seront pas assignés dans la plus part des cas dans des clusters puisque leur score de couvertrure est très bas. Aussi, traiter ces séquences comme étant des séquences partielles, nous permettra avec silix de les ajouter aux clusters de manière postérieur et ainsi éviter de prendre en compte ces séquences partielles lors de la créations des clusters. 
+*Création d'un premier run silix sur le blast de tous les loci contre les séquences protéiques virals de manière très stringent. Ceci permet de trouver les loci dits "partielles", c'est à dire des locus ne répondant pas aux seuils imposés, il s'agira alors vraisemblablement de loci ayant des similarités ponctuelles le long des séquences, pouvant alors êtres intérpétés comme étant des domaines orthologues très conservés, néanmoins ce genre de domaines très conservés ne seront pas assignés dans la plus part des cas dans des clusters puisque leur score de couvertrure est très bas. Aussi, traiter ces séquences comme étant des séquences partielles, nous permettra avec silix de les ajouter aux clusters de manière postérieur et ainsi éviter de prendre en compte ces séquences partielles lors de la créations des clusters. 
 
 
-#First we will perform a blastx with mmseqs2 with the viral protein db created earlier as db and our viral nucleotides loci as queries 
+##### 3) First we will perform a blastx with mmseqs2 with the viral protein db created earlier as db and our viral nucleotides loci as queries 
 
 ![Image description](Silix_clustering_step1.png)
 
@@ -281,29 +269,31 @@ Création d'un premier run silix sur le blast de tous les loci contre les séque
 ```cat *.m8 > Matches_Viralprot_vs_Viral_loci_result_all.m8```
 
 
-#Change the order of the column len for silix 
+##### 4) Change the order of the column len for silix 
 
 ```awk  '{FS="\t"; OFS="\t"}{print $1, $2, $3*100, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13}' /beegfs/data/bguinet/these/Viral_sequence_loci/mmseqs2_analysis/Matches_Viralprot_vs_Viral_loci_result_all.m8 > /beegfs/data/bguinet/these/Viral_sequence_loci/mmseqs2_analysis/Matches_Viralprot_vs_Viral_loci_result2_all.m8```
 
 
 ![Image description](Silix_clustering_step2.png)
 
-Now we wil perform the first stringente silix clustering between Viral_seq_loci and the db 
-First we will recreate the first file wich serve to indicate the sequence length , so we cat aa and dna sequences together
+##### 5) Stringente Silix 
+*Now we wil perform the first stringente silix clustering between Viral_seq_loci and the db 
+*First we will recreate the first file wich serve to indicate the sequence length , so we cat aa and dna sequences together
 
 ```cat /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/All_fasta_viral_loci.fna /beegfs/data/bguinet/these/NCBI_protein_viruses/All_viral_protein_sequences_without_contamination_controls.fa > /beegfs/data/bguinet/these/silix_concatenate_file_all.fa```
 
-run the silix mode with stringent obtions 
+###### run the silix mode with stringent obtions 
 ```/beegfs/data/penel/programmes_ext/silix/silix-1.2.10-p1-simon/src/silix\ /beegfs/data/bguinet/these/silix_concatenate_file_all.fa\ /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/Matches_Viralprot_vs_Viral_loci_result2_all.m8\ -i 0.11 -r 1.2 --net -f cluster_  > /beegfs/data/bguinet/these/Genomes/Viral_sequences_loci/mmseqs2_analysis/seq_clusters_silix_stringent_all.fnodes```
 
 
-Une fois ce silix effectué, nous allons identifier tous les clusters étant orphelins (donc les séquences protéiques). Un deuxième silix va ensuite être effectué, en ne prenant en compte dans le fichier blast, uniquement les candidats matchant avec une séquence protéique virale partielle, les paramètres réglés à 0, nous pourrons alors ensuite obtenir les couvertures et identités calculés par silix et ensuite filtrer les séquences candidates partielles les plus probables, et les réjouter ensuite au cluster original. 
+##### 6) CLuster orphelins 
+*Une fois ce silix effectué, nous allons identifier tous les clusters étant orphelins (donc les séquences protéiques). Un deuxième silix va ensuite être effectué, en ne prenant en compte dans le fichier blast, uniquement les candidats matchant avec une séquence protéique virale partielle, les paramètres réglés à 0, nous pourrons alors ensuite obtenir les couvertures et identités calculés par silix et ensuite filtrer les séquences candidates partielles les plus probables, et les réjouter ensuite au cluster original. 
 
-L'idée est donc d'effectuer un nouveau silix avec un fichier tab blast ne contenant que les séquences dites partielles donc en éliminants tous les hits avec des protéines complettes. Pour cela nous devons identifier les séquences partielles. 
+*L'idée est donc d'effectuer un nouveau silix avec un fichier tab blast ne contenant que les séquences dites partielles donc en éliminants tous les hits avec des protéines complettes. Pour cela nous devons identifier les séquences partielles. 
 
-This sequence (orphelins) presents no sufficient similarity with any sequence of the database, bNon-orphan families are all families containing at least two sequences
+*This sequence (orphelins) presents no sufficient similarity with any sequence of the database, bNon-orphan families are all families containing at least two sequences
 
-#Only keep partials viral proteins (orphelins ones)
+Only keep partials viral proteins (orphelins ones)
 
 ```
 import pandas as pd 
@@ -316,8 +306,7 @@ for ids in df2[1]:
 print(ids, file = file_partial_seq)
 ```
 
-
-Maintenant nous avons un fichier partials_locus_ids.txt qui contient tous les ids des séquences partielles, il suffit alors de ne garder que toutes les lignes du fichier blast qui contiennent un hit avec ces séquences-là
+*Maintenant nous avons un fichier partials_locus_ids.txt qui contient tous les ids des séquences partielles, il suffit alors de ne garder que toutes les lignes du fichier blast qui contiennent un hit avec ces séquences-là
 
 ```import pandas as pd
 blast_tab = pd.read_csv("Matches_Viralprot_vs_Viral_loci_result2_all.m8",header=None,sep="\t")
@@ -330,16 +319,19 @@ blast_partial = blast_tab.loc[blast_tab[1].isin(vals)]
 blast_partial.to_csv("Matches_Viralprot_vs_Viral_loci_result_partial.m8", sep='\t',header=None,index=False)
 ```
 
-No we get a new blast tab file wich only contain hit with a partial sequence 
+*No we get a new blast tab file wich only contain hit with a partial sequence 
 
-The idea is now to make a silix run with 0 parameters and then only add the partials sequences in the clusters with a certain threshold 
+
+##### 7) Partial sequence adding 
+*The idea is now to make a silix run with 0 parameters and then only add the partials sequences in the clusters with a certain threshold 
 
 ```/beegfs/data/penel/programmes_ext/silix/silix-1.2.10-p1-simon/src/silix\
  /beegfs/data/bguinet/these/Viral_sequences_loci/silix_concatenate_file_all.fa\
  /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/Matches_Viralprot_vs_Viral_loci_result_partial.m8\
  -i 0 -r 0 --net -f cluster_  > /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/seq_clusters_silix_partials_all.fnodes
 ```
-No we will only keep partials sequences that have a cov >= 0.35 and then add them into the clusters and merge the fnode file with the blast file
+##### 8) Filtering on partial sequences
+*No we will only keep partials sequences that have a cov >= 0.35 and then add them into the clusters and merge the fnode file with the blast file
 
 ```python3 /beegfs/home/bguinet/M2_script/cluster_silix_merging.py
  -b /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/Matches_Viralprot_vs_Viral_loci_result2_all.m8\
@@ -348,44 +340,35 @@ No we will only keep partials sequences that have a cov >= 0.35 and then add the
  -s /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/seq_clusters_silix_stringent_all.fnodes
 ```
 
-Now we will collect information about taxa ID and genomic environment 
 
-#################
-# GET TAXID INF #
-#################
 
-1 create sqlit database using taxadb in order to recover the taxa informations
+## Collect information about taxa ID and genomic environment 
+
+### TAX ID information
+##### 1) Create sqlit database using taxadb in order to recover the taxa informations
 ```pip install taxadb```
 
 ```/beegfs/data/bguinet/myconda/bin/taxadb download -o taxadb
 /beegfs/data/bguinet/myconda/bin/taxadb create -i taxadb --dbname taxadb.sqlite --fast
 ```
-
-
-Get TAxid of all target protein seqs and add it on the column in the mergeed silix_blast dataframe
+##### 2) Get TAxid of all target protein seqs and add it on the column in the mergeed silix_blast dataframe
 
 ```python3 /beegfs/home/bguinet/M2_script/add_taxid_info.py -b /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/dataframe_brute.txt -d /beegfs/data/bguinet/taxadb.sqlite -o /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file.m8
 ```
 
-A file  Out_file.m8 will be generated with cluster and taxid informations added 
+A file  **Out_file.m8** will be generated with cluster and taxid informations added 
 
 
-#################
-# GET ENV INF   #
-#################
+### Environment information
 
 ```python3 /beegfs/home/bguinet/M2_script/Add_genomic_env.py -i /beegfs/home/bguinet/M2_script/file_all_species_name_and_outgroup.txt -b /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file.m8 -o /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file_env.m8
 ```
 
-A file  Out_file_env.m8 will be generated with cluster, taxid and genomic environment informations added .
+A file  **Out_file_env.m8** will be generated with cluster, taxid and genomic environment informations added .
 
 
-#############################
-# FILTERING OF CONTAMINANT. #
-#############################
-
-
-#In order to filter the possible contaminates we will do the following filtering on the candidats:
+## Filtergin of contaminant according to genomic environment
+*In order to filter the possible contaminates we will do the following filtering on the candidats:
 
 ```import pandas as pd 
 
@@ -404,15 +387,11 @@ blast_tab[(blast_tab['pvalue_cov'].)]
 ```
 
 
-
-
-#################################
-#####PHYLOGENY OF CLUSTERS.  ####
-#################################
+## Phylogeny of clusters  
 
 ![Image description](Gene_phylogeny_step.png)
 
-Alignment of each clusters
+#### 1) Alignment of each clusters
 ```for file in /beegfs/data/bguinet/M2/Gene_phylogeny/cluster_??????.fa ; do
 echo "/beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/run_Alignment.sh $file";
 done > clustal_locus_align.cmds
@@ -423,15 +402,16 @@ sbatch $file;
 done
 ```
 
-Now that we aligned each cluster, we will concatenate all HSP togethers:
+#### 2) Concatenation 
+*Now that we aligned each cluster, we will concatenate all HSP togethers:
 
-Candidates HSPs are candidats that are in the same scaffold and same species, then they could be duplicates or HSPs. 
+*Candidates HSPs are candidats that are in the same scaffold and same species, then they could be duplicates or HSPs. 
 A HSP is defined when the ratio between number of AA matching with another AA / nb AA matching with a gap is < 0.20.
 
 ```python3 /beegfs/home/bguinet/M2_script/Merge_HSP_sequences_within_clusters.py -d /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/ -e .fa.aln
 ```
-
-Then we align these new cluster once again:
+#### 3) Alignment of HSPs 
+*Then we align these new cluster once again:
 ```for file in /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/cluster_*.fa.aln_Hsp; do
 echo "/beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/run_Alignment.sh $file";
 done > clustal_locus_align_HSP.cmds
@@ -442,7 +422,7 @@ sbatch $file;
 done
 ```
 
-Then we will rename these files in order to match the original cluster.aln name 
+#### 4)Then we will rename these files in order to match the original cluster.aln name 
 ```for file in /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/cluster_*.fa.aln_Hsp.aln; do
 DEST=$(echo $file | sed 's/.fa.*/.fa.aln/')
 rm $DEST
