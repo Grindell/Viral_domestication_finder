@@ -351,9 +351,9 @@ blast_partial.to_csv("Matches_Viralprot_vs_Viral_loci_result_partial.m8", sep='\
 ```/beegfs/data/bguinet/myconda/bin/taxadb download -o taxadb
 /beegfs/data/bguinet/myconda/bin/taxadb create -i taxadb --dbname taxadb.sqlite --fast
 ```
-##### 2) Get TAxid of all target protein seqs and add it on the column in the mergeed silix_blast dataframe
+##### 2) Get TAxid of all target protein seqs and add it on the column in the merged silix_blast dataframe
 
-```python3 /beegfs/home/bguinet/M2_script/add_taxid_info.py -b /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/dataframe_brute.txt -d /beegfs/data/bguinet/taxadb.sqlite -o /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file.m8
+```python3 /beegfs/home/bguinet/these_script/add_taxid_info.py -b /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/dataframe_brute.txt -d /beegfs/data/bguinet/taxadb.sqlite -o /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file.m8
 ```
 
 A file  **Out_file.m8** will be generated with cluster and taxid informations added 
@@ -361,7 +361,7 @@ A file  **Out_file.m8** will be generated with cluster and taxid informations ad
 
 ### Environment information
 
-```python3 /beegfs/home/bguinet/M2_script/Add_genomic_env.py -i /beegfs/home/bguinet/M2_script/file_all_species_name_and_outgroup.txt -b /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file.m8 -o /beegfs/data/bguinet/M2/Viral_sequences_loci/mmseqs2_analysis/Out_file_env.m8
+```python3 /beegfs/home/bguinet/M2_script/Add_genomic_env.py -i /beegfs/home/bguinet/M2_script/file_all_species_name_and_outgroup.txt -b /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/Out_file.m8 -o /beegfs/data/bguinet/these/Viral_sequences_loci/mmseqs2_analysis/Out_file_env.m8
 ```
 
 A file  **Out_file_env.m8** will be generated with cluster, taxid and genomic environment informations added .
@@ -384,15 +384,28 @@ blast_tab = blast_tab[(blast_tab['pvalue_cov'] > 0.01) & (blast_tab['pvalue_gc']
  (blast_tab['pvalue_cov'].isnull()) & (blast_tab['pvalue_gc'] > 0.05) ] #If there is no coverage value, then keep candidats with a high GC pvalue. 
 
 blast_tab[(blast_tab['pvalue_cov'].)]
+blast_tab.to_csv("Out_file_filtered.m8", sep='\t',header=None,index=False)
 ```
-
+Génération d'un fichier **Out_file_filtered.m8**.
 
 ## Phylogeny of clusters  
 
+### 1) Create cluster alignment files : 
+*Now we will create :
+- **cluster_XXXXX.fa** (Viral loci and viral sequences in protein format)
+- **cluster_XXXXX.dna** (Viral loci and viral sequences in nucleotides format for dN/dS analysis)
+- **cluster_XXXXX.aa** (Viral loci and viral sequences in protein format)
+
+for each cluster that will contain the AA sequences of viral and locus :
+Création des fichiers clusters_N avec dans chacun les séquences protéiques virals et loci candidats eucaryotes
+```python3 Get_loci_seq_phylo.py -b /beegfs/home/bguinet/M2_script/Out_file_filtered.m8```
+
+mkdir 
+
 ![Image description](Gene_phylogeny_step.png)
 
-#### 1) Alignment of each clusters
-```for file in /beegfs/data/bguinet/M2/Gene_phylogeny/cluster_??????.fa ; do
+#### 2) Alignment of each clusters
+```for file in /beegfs/data/bguinet/these/Gene_phylogeny/cluster_??????.fa ; do
 echo "/beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/run_Alignment.sh $file";
 done > clustal_locus_align.cmds
 python3 makeAlignements_scripts.py 10 clustal_locus_align.cmds
@@ -402,7 +415,7 @@ sbatch $file;
 done
 ```
 
-#### 2) Concatenation 
+#### 3) Concatenation 
 *Now that we aligned each cluster, we will concatenate all HSP togethers:
 
 *Candidates HSPs are candidats that are in the same scaffold and same species, then they could be duplicates or HSPs. 
@@ -410,7 +423,7 @@ A HSP is defined when the ratio between number of AA matching with another AA / 
 
 ```python3 /beegfs/home/bguinet/M2_script/Merge_HSP_sequences_within_clusters.py -d /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/ -e .fa.aln
 ```
-#### 3) Alignment of HSPs 
+#### 4) Alignment of HSPs 
 *Then we align these new cluster once again:
 ```for file in /beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/cluster_*.fa.aln_Hsp; do
 echo "/beegfs/data/bguinet/M2/Gene_phylogeny/Alignment_clusters/run_Alignment.sh $file";
