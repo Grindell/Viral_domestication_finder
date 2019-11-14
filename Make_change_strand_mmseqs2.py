@@ -42,8 +42,8 @@ if Type_species == "H":
 	blast=pd.read_table(blast_file,header=None,comment='#')
 	blast.columns = ["query", "target", "pidentity", "alnlength", "mismatches", "gapopens", "qstart", "qend", "sstart", "ssend", "evalue,","bit_score"]
 	sLength=blast.shape[0]
-	blast['sstart'] = blast['sstart'].apply(lambda x: x - 1)#to correct the issue 
-	blast['ssend'] = blast['ssend'].apply(lambda x: x + 2)#because the coordinate are from codons
+	#blast['sstart'] = blast['sstart'].apply(lambda x: x - 1)#to correct the issue 
+	#blast['ssend'] = blast['ssend'].apply(lambda x: x + 2)#because the coordinate are from codons
 	blast['strand']=np.where(blast["sstart"]>blast["ssend"],'-','+')
 	blast[['sstart', 'ssend']] = np.sort(blast[['sstart', 'ssend']].values, axis=1)
 	blast_file=blast_file.replace('.m8','')
@@ -55,8 +55,8 @@ if Type_species == "V":
 	blast=pd.read_table(blast_file,header=None)
 	blast.columns = ["query", "tlen", "target", "pident", "alnlen", "mismatch", "gapopen","qstart", "qend", "tstart", "tend", "evalue", "bits"]
 	sLength=blast.shape[0]
-	blast['qstart'] = blast['qstart'].apply(lambda x: x - 1)#to correct the issue 
-	blast['qend'] = blast['qend'].apply(lambda x: x + 2)#because the coordinate are from codons
+	#blast['qstart'] = blast['qstart'].apply(lambda x: x - 1)#to correct the issue 
+	#blast['qend'] = blast['qend'].apply(lambda x: x + 2)#because the coordinate are from codons
 	blast['strand']=np.where(blast["qstart"]>blast["qend"],'-','+')
 	blast[['qstart', 'qend']] = np.sort(blast[['qstart', 'qend']].values, axis=1)
 	blast_file=blast_file.replace('.m8','')
