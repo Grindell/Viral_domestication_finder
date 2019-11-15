@@ -95,8 +95,6 @@ Positif_controls_viral_domestication_targeted.fa
 #### 6) Vérifier qu'il n'y ait pas de séquences dupliquées : 
 
 
-
-
 ## Organiser son espace de travail 
 First of all the user will have to make a file in which will be present all the genomes that he wants to study in format: Genus_species.fa
 in the format : 
@@ -126,7 +124,6 @@ in the format :
  ```
  
  By creating a new directory having the same name as the ```Genus_species.fa``` file 
- 
 ```
  DIR="/Users/admin/Documents/"
 
@@ -176,8 +173,6 @@ At the end of the process you should have the folowing message :
 
 #### Etape pour créer la base de donnée mmseqs2 et permet également d'alleger le nom des séquences busco (attention étape non complette dans la suite pour 5espèces)
  ```cat /beegfs/data/bguinet/these/Species_genome_names.txt | while read line; do sed -i 's@:/beegfs/data/bguinet/these/Genomes/${line}/${line}.fa@@g' /beegfs/data/bguinet/these/Genomes/${line}/run_busco/run_BUSCO_v3/compiled_busco_aa ```
-
-
 
 ## Recherche d'Homologie de séquence via MMseqs2 pour chacun des génomes. 
 
@@ -243,7 +238,61 @@ Recupération de tous les locus selon leurs coordonées dans les génomes de cha
 
 
 
-## Clustering de gènes 
+## Clustering de gènes (avec MMSEQS2 cluster)
+
+Create a Clustering directory 
+mkdir /beegfs/data/bguinet/these/Clustering
+
+#### 1)Make the database (Viral loci in protein and Virus protein db seq)
+Because we can not cluster non-symmetric sets (query/target) with MMseqs2. To overcome this limination we will combine the ORFs of the query (thus translated into protein) with the proteins from the target (virus proteins database) and cluster them together.
+
+- So first we will translate all Viral_loci into protein 
+
+```python3 Translate_DNA_to_AA.py -f /beegfs/data/bguinet/these/Viral_sequences_loci/All_fasta_viral_loci.fna -o /beegfs/data/bguinet/these/Viral_sequences_loci/```
+
+Génération d'un fichier **All_fasta_viral_loci.aa**. 
+
+- Then we will concatenate the ORFs of the query with the proteins from the target (virus proteins database)
+
+```cat /beegfs/data/bguinet/these/Viral_sequences_loci/All_fasta_viral_loci.aa /beegfs/data/bguinet/these/NCBI_protein_viruses/All_viral_protein_sequences_without_contamination_controls.fa > /beegfs/data/bguinet/these/Clustering/Candidate_viral_loci_and_viral_protein.aa```
+
+- Create the MMseqs2 database:
+
+```/beegfs/data/bguinet/TOOLS/MMseqs2/build/bin/mmseqs createdb /beegfs/data/bguinet/these/Clustering/Candidate_viral_loci_and_viral_protein.aa Candidate_viral_loci_and_viral_protein_db```
+
+#### 2)Run the clustering method (Cascaded clustering)
+*Nb: To achieve lower sequence identities and/or to further improve the resulting clusters, we continue with three cascaded clustering steps: In the first step of the cascaded clustering the prefiltering runs with a low sensitivity of 1 and a very high result significance threshold, in order to accelerate the calculation and search only for hits with a very high sequence identity. Then alignments are calculated and the database is clustered. The second step takes the representative sequences of the first clustering step and repeats the prefiltering, alignment and clustering steps. This time, the prefiltering is executed with a higher sensitivity and a lower result significance threshold for catching sequence pairs with lower sequence identity. In the last step, the whole process is repeated again with the final target sensitivity. At last, the clustering results are merged and the resulting clustering is written to the output database.
+
+*Cascaded clustering yields more sensitive results than simple clustering. Also, it allows very large cluster sizes in the end clustering resulting from cluster merging (note that cluster size can grow exponentially in the cascaded clustering workflow), which is not possible with the simple clustering workflow because of the limited maximum number of sequences passing the prefiltering and the alignment. Therefore, we strongly recommend to use cascaded clustering especially to cluster larger databases and to obtain maximum sensitivity.
+
+- Coverage min : 0.35 
+- Evalue min : 0.001
+- Sensititivy : 9
+
+```/beegfs/data/bguinet/TOOLS/MMseqs2/build/bin/mmseqs cluster Candidate_viral_loci_and_viral_protein_db Candidate_viral_loci_and_viral_protein_clu tmp --threads 10 -s 9 -c 0.35  -e 0.001```
+
+Génération de plusieurs fichiers **Candidate_viral_loci_and_viral_protein_clu..**. 
+
+In order to convert it into a tabular format:
+
+```/beegfs/data/bguinet/TOOLS/MMseqs2/build/bin/mmseqs createtsv Candidate_viral_loci_and_viral_protein_db Candidate_viral_loci_and_viral_protein_db Candidate_viral_loci_and_viral_protein_clu Candidate_viral_loci_and_viral_protein_clu.tsv```
+
+Génération d'un fichier tab **Candidate_viral_loci_and_viral_protein_clu.tsv**
+
+In order to convert it into a tab format such as: 
+
+Cluster1 Seq1
+Cluster1 Seq2
+Cluster2 Seq3
+Cluster2 Seq4
+Cluster2 Seq5
+
+Where Seq1 and Seq2 are both in the same Cluster1 and Seq3,4 and Seq5 are in the Cluster2. 
+
+python3 MMseqs2_clust_to_tab_format.py -f /beegfs/data/bguinet/these/Clustering/Candidate_viral_loci_and_viral_protein_clu.tsv -o /beegfs/data/bguinet/these/Clustering/
+
+
+
 
 ##### 1) Make a Viral_sequence_loci directory 
 
